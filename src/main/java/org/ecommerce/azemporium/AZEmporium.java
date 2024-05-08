@@ -1,13 +1,13 @@
-package org.ecommerce.pssw;
+package org.ecommerce.azemporium;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PsswApplication {
+public class AZEmporium {
 
     public static void main(String[] args) {
-        SpringApplication.run(PsswApplication.class, args);
+        SpringApplication.run(AZEmporium.class, args);
     }
 
 }
