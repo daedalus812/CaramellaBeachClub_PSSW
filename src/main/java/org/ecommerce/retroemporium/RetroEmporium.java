@@ -1,13 +1,13 @@
-package org.ecommerce.azemporium;
+package org.ecommerce.retroemporium;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AZEmporium {
+public class RetroEmporium {
 
     public static void main(String[] args) {
-        SpringApplication.run(AZEmporium.class, args);
+        SpringApplication.run(RetroEmporium.class, args);
     }
 
 }

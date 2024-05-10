@@ -1,4 +1,4 @@
-package org.ecommerce.azemporium.entities;
+package org.ecommerce.retroemporium.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,7 +14,7 @@ public class Reso {
     @Column(name = "id_reso", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_ordine", nullable = false)
     private Ordine idOrdine;
 

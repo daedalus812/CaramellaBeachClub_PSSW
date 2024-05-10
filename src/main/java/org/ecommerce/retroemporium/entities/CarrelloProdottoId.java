@@ -1,4 +1,4 @@
-package org.ecommerce.azemporium.entities;
+package org.ecommerce.retroemporium.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

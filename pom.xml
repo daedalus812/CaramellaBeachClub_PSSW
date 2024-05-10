@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.example</groupId>
-    <artifactId>AZEmporium</artifactId>
+    <artifactId>Retro Emporium</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>PSSW</name>
     <description>PSSW</description>

@@ -1,4 +1,4 @@
-package org.ecommerce.azemporium.entities;
+package org.ecommerce.retroemporium.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,22 +7,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "carrello_prodotto")
-public class CarrelloProdotto {
+@Table(name = "carrello_utente")
+public class CarrelloUtente {
     @EmbeddedId
-    private CarrelloProdottoId id;
+    private CarrelloUtenteId id;
 
     @MapsId("carrelloId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "carrello_id", nullable = false, referencedColumnName = "id_carrello")
     private Carrello carrello;
 
-    @MapsId("prodottoId")
+    @MapsId("utenteId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "prodotto_id", nullable = false)
-    private Prodotto prodotto;
-
-    @Column(name = "quantita")
-    private Integer quantita;
+    @JoinColumn(name = "utente_id", nullable = false)
+    private Utente utente;
 
 }
