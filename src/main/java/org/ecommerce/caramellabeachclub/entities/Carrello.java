@@ -1,14 +1,12 @@
-package org.ecommerce.retroemporium.entities;
+package org.ecommerce.caramellabeachclub.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "carrello", uniqueConstraints = {
         @UniqueConstraint(name = "id_carrello", columnNames = {"id_carrello"}),

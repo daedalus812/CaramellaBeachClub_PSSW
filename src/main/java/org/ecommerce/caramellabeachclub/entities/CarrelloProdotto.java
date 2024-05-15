@@ -1,16 +1,16 @@
-package org.ecommerce.retroemporium.entities;
+package org.ecommerce.caramellabeachclub.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+@Data
 @Getter
 @Setter
 @Entity
 @Table(name = "carrello_prodotto")
 public class CarrelloProdotto {
-    @EmbeddedId
-    private CarrelloProdottoId id;
 
     @MapsId("carrelloId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -24,5 +24,9 @@ public class CarrelloProdotto {
 
     @Column(name = "quantita")
     private Integer quantita;
+    @Getter
+    @Setter
+    @Id
+    private Integer id;
 
 }
