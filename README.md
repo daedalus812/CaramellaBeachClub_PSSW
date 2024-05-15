@@ -1,17 +1,17 @@
-### RetroGaming Emporium 🎮
+### Caramella Beach Club 🏖️
 
-Welcome to Retro Emporium! This repository hosts the source code for a web-based e-commerce platform developed as a project for the "Software Platforms and Web Development" course at University of Calabria.
+Welcome to Caramella Beach Club! This repository hosts the source code for a web-based e-commerce platform developed as a project for the "Software Platforms and Web Development" course at the University of Calabria.
 
 #### Project Description 🚀
 
-Retro Emporium is an online marketplace specializing in the sale of retro video games. Our platform offers a curated selection of classic titles for retro gaming enthusiasts, including games for PlayStation 1, PlayStation 2 and Game Boy Advance.
+Caramella Beach Club is an online marketplace specializing in the sale of products and services for our beach establishment. Our platform offers a curated selection of items and services for beachgoers, including sunbeds, umbrellas, and relaxation packages.
 
 #### Features 🎉
 
-- **Browse Retro Games:** Explore our collection of vintage video games from various platforms.
-- **User Registration:** Create an account to access personalized features and save your favorite games.
-- **Add to Cart:** Easily add retro games to your cart and proceed to checkout securely.
-- **Product Reviews:** Share your gaming experiences by leaving reviews for the games you've purchased.
+- **Explore Beach Services:** Discover our collection of products and services for maximum comfort at the beach.
+- **User Registration:** Create an account to access personalized features and save your favorite items.
+- **Add to Cart:** Easily add items and services to your cart and proceed to checkout securely.
+- **Product Reviews:** Share your experiences by leaving reviews for the products and services you've purchased.
 - **Order Tracking:** Keep track of your orders with real-time updates on shipping and delivery status.
 - **Easy Returns:** Hassle-free return process ensures your satisfaction with every purchase.
 
@@ -28,6 +28,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 #### About Us ℹ️
 
-Retro Emporium is a project developed by me as part of the "Software Platforms and Web Development" course at UNICAL. It aims to provide a nostalgic gaming experience for retro gaming enthusiasts.
+Caramella Beach Club is a project developed by me as part of the "Software Platforms and Web Development" course at UNICAL. It aims to provide a relaxing and comfortable experience for all beach lovers.
 
-Happy Retro Gaming! 🎮
+Enjoy your time at Caramella Beach Club! 🏖️
