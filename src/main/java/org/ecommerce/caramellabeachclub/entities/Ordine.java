@@ -9,8 +9,6 @@ import java.time.Instant;
 import java.time.LocalTime;
 
 @Data
-@Getter
-@Setter
 @Entity
 @Table(name = "ordine")
 public class Ordine {

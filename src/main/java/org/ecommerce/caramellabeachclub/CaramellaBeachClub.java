@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RetroEmporium {
+public class CaramellaBeachClub {
 
     public static void main(String[] args) {
-        SpringApplication.run(RetroEmporium.class, args);
+        SpringApplication.run(CaramellaBeachClub.class, args);
     }
 
 }

@@ -33,4 +33,11 @@ public class Transazione {
     @Column(name = "importo", nullable = false, precision = 50)
     private BigDecimal importo;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "metodo_di_pagamento", nullable = false)
+    private MetodoDiPagamento metodoDiPagamento;
+
+    @Column(name = "esito", nullable = false)
+    private boolean esito;
+
 }

@@ -10,5 +10,8 @@ public interface CarrelloRepository extends JpaRepository<Carrello, Integer> {
     //trova il carrello tramite l'ID utente
     Carrello findByIdUtente(int idUtente);
 
+    //trova il carrello tramite l'ID Carrello
+    Carrello findByIdCarrello(int idCarrello);
+
 
 }
