@@ -15,6 +15,7 @@ import java.util.Set;
 @Entity
 @Table(name = "prodotto")
 public class Prodotto {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_prodotto", nullable = false)
@@ -39,4 +40,6 @@ public class Prodotto {
     @OneToMany(mappedBy = "idProdotto")
     private Set<Recensione> recensiones = new LinkedHashSet<>();
 
+    @Column(name = "disp")
+    private Integer disp;
 }

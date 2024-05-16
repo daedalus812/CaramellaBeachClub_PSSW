@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CarrelloRepository extends JpaRepository<Carrello, Integer> {
 
-    public Carrello findById(int id);
-
+    //trova il carrello tramite l'ID utente
+    Carrello findByIdUtente(int idUtente);
 
 
 }
