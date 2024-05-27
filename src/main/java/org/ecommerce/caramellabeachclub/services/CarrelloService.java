@@ -1,6 +1,5 @@
 package org.ecommerce.caramellabeachclub.services;
 
-import org.ecommerce.caramellabeachclub.resources.other.*;
 import org.ecommerce.caramellabeachclub.entities.*;
 import org.ecommerce.caramellabeachclub.repositories.CarrelloProdottoRepository;
 import org.ecommerce.caramellabeachclub.repositories.CarrelloRepository;
@@ -14,8 +13,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.Random;
-import java.util.Set;
-
 
 @Service
 public class CarrelloService {
@@ -29,17 +26,14 @@ public class CarrelloService {
     @Autowired
     private CarrelloProdottoRepository carrelloProdottoRepository;
 
+    private static final Random RANDOM = new Random();
+
     @Transactional
     public void aggiungiAlCarrello(int idUtente, Prodotto p, int quantita)
             throws UserNotFoundException, InvalidQuantityException {
 
-        // Verifico che l'utente esista
         Utente user = utenteRepository.getUtenteById(idUtente);
-        if (user == null) {
-            throw new UserNotFoundException("Per proseguire devi prima loggarti!");
-        }
 
-        // Verifico che esista un carrello per quell'utente, altrimenti se è vuoto lo creo
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
         if (carrello == null) {
             carrello = new Carrello();
@@ -47,127 +41,88 @@ public class CarrelloService {
             carrello = carrelloRepository.save(carrello);
         }
 
-        // Verifico la disponibilità del prodotto
         if (p.getDisp() < quantita) {
-            throw new InvalidQuantityException
-                    ("Impossibile aggiungere al carrello: il prodotto non è disponibile per la quantità desiderata");
+            throw new InvalidQuantityException("Impossibile aggiungere al carrello: il prodotto non è disponibile per la quantità desiderata");
         }
 
-        // Creo l'aggiunta e la collego al carrello dell'utente
         CarrelloProdotto aggiunta = new CarrelloProdotto();
         aggiunta.setCarrello(carrello);
         aggiunta.setProdotto(p);
         aggiunta.setQuantita(quantita);
         carrelloProdottoRepository.save(aggiunta);
+    }// Metodo per aggiungere al carrello
 
-    }//---aggiungi al carrello---
-
-
+    @Transactional
     public void plusAdding(int idUtente, CarrelloProdotto cp)
-            throws UserNotFoundException, InvalidQuantityException{
+            throws UserNotFoundException, InvalidQuantityException {
 
-        // Verifico che l'utente esista
-        Utente user = utenteRepository.getUtenteById(idUtente);
-        if (user == null) {
-            throw new UserNotFoundException("Per proseguire devi prima loggarti!");
-        }
+        utenteRepository.getUtenteById(idUtente);
 
-        // Verifico la disponibilità del prodotto
         Prodotto p = cp.getProdotto();
         if (p.getDisp() < 1) {
-            throw new InvalidQuantityException
-                    ("Impossibile aggiungere al carrello: il prodotto non è disponibile per la quantità desiderata");
+            throw new InvalidQuantityException("Impossibile aggiungere al carrello: il prodotto non è disponibile per la quantità desiderata");
         }
 
-        cp.setQuantita(cp.getQuantita()+1);
+        cp.setQuantita(cp.getQuantita() + 1);
         carrelloProdottoRepository.save(cp);
+    }// Metodo per aggiungere al carrello da un pulsantino '+'
 
-    }//---Aggiunta al carrello tramite pulsantino "+"---
-
-
+    @Transactional
     public void rimuoviDalCarrello(int idUtente, CarrelloProdotto cp)
             throws UserNotFoundException, InvalidOperationException {
 
-        // Verifico che l'utente esista
         Utente user = utenteRepository.getUtenteById(idUtente);
-        if (user == null) { throw new UserNotFoundException("Per proseguire devi prima loggarti!"); }
-
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
 
-        // Ulteriori verifiche
-        if (carrello == null) {
-            throw new InvalidOperationException("Impossibile proseguire con l'operazione"); }
-        if (!(cp.getCarrello().equals(carrello))) {
-            throw new InvalidOperationException("Impossibile proseguire con l'operazione"); }
+        if (!cp.getCarrello().equals(carrello)) {
+            throw new InvalidOperationException("Impossibile proseguire con l'operazione");
+        }
 
         carrelloProdottoRepository.delete(cp);
-        carrelloRepository.save(carrello);
-        
+    }// Metodo per rimuovere dal carrello
 
-    }// Rimuovi dal carrello
-
+    @Transactional
     public void minusRemoving(int idUtente, CarrelloProdotto cp)
             throws UserNotFoundException, InvalidOperationException {
 
-        // Verifico che l'utente esista
         Utente user = utenteRepository.getUtenteById(idUtente);
-        if (user == null) { throw new UserNotFoundException("Per proseguire devi prima loggarti!"); }
-
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
 
-        // Ulteriori verifiche
-        if (carrello == null) {
-            throw new InvalidOperationException("Impossibile proseguire con l'operazione"); }
-        if (!(cp.getCarrello().equals(carrello))) {
-            throw new InvalidOperationException("Impossibile proseguire con l'operazione"); }
+        if (!cp.getCarrello().equals(carrello)) {
+            throw new InvalidOperationException("Impossibile proseguire con l'operazione");
+        }
 
-        cp.setQuantita(cp.getQuantita()-1);
+        if (cp.getQuantita() > 1) {
+            cp.setQuantita(cp.getQuantita() - 1);
+            carrelloProdottoRepository.save(cp);
+        } else {
+            carrelloProdottoRepository.delete(cp);
+        }
+    }// Metodo per rimuovere dal carrello da un pulsantino '-'
 
-        carrelloProdottoRepository.delete(cp);
-        carrelloRepository.save(carrello);
-
-
-    }//---Rimozione dal carrello tramite pulsantino "-"---
-
-    public void svuotaCarrello (int idUtente)
+    @Transactional
+    public void svuotaCarrello(int idUtente)
             throws UserNotFoundException, InvalidOperationException {
 
-        // Verifico che l'utente esista
         Utente user = utenteRepository.getUtenteById(idUtente);
-        if (user == null) {
-            throw new UserNotFoundException("Per proseguire devi prima loggarti!");
-        }
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
 
-        // Verifico che il carrello non sia già vuoto
-        Carrello carrello = carrelloRepository.findByIdUtente(idUtente);
-
-        // La gestione di questa eccezione può anche avvenire rendendo non cliccabile il tasto "Svuota Carrello"
-        if (carrello==null) { throw new InvalidOperationException("Il carrello è già vuoto!"); }
-
+        carrelloProdottoRepository.deleteAll(carrello.getCarrelloProdottos());
         carrelloRepository.delete(carrello);
-        carrelloRepository.save(carrello);
+    }// Metodo per svuotare il carrello
 
-    }//---Svuota Carrello---
+    @Transactional
+    public void ordina(int idUtente, MetodoDiPagamento metodoDiPagamento)
+            throws UserNotFoundException, InvalidOperationException {
 
-    public void ordina(Utente utente, MetodoDiPagamento metodoDiPagamento){
-
-        // Verifico che l'utente esista
-        Utente user = utenteRepository.getUtenteById(utente.getId());
-        if (user == null) {
-            throw new UserNotFoundException("Per proseguire devi prima loggarti!");
-        }
-
-        // Verifico che il carrello non sia vuoto
-        Carrello carrello = carrelloRepository.findByIdUtente(utente.getId());
-
-        // La gestione di questa eccezione può anche avvenire rendendo non cliccabile il tasto "Procedi all'ordine"
-        if (carrello==null) { throw new InvalidOperationException("Il carrello è vuoto!"); }
+        Utente user = utenteRepository.getUtenteById(idUtente);
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
 
         Ordine ordine = new Ordine();
         Transazione transazione = new Transazione();
 
-        ordine.setIdCarrello(carrelloRepository.findByIdUtente(utente.getId()));
-        ordine.setIdUtente(utente);
+        ordine.setIdCarrello(carrello);
+        ordine.setIdUtente(user);
         ordine.setOra(LocalTime.now());
         ordine.setStato("Processamento in corso...");
 
@@ -176,7 +131,6 @@ public class CarrelloService {
         transazione.setOra(LocalTime.now());
         transazione.setData(Instant.now());
         transazione.setImporto(calcolaImporto(carrello));
-
 
         boolean esitoPagamento = processaPagamento(metodoDiPagamento, transazione.getImporto());
 
@@ -187,42 +141,30 @@ public class CarrelloService {
             transazione.setEsito(false);
             ordine.setStato("Pagamento fallito");
         }
+    }// Metodo per eseguire un ordine di un carrello
 
-    }//---Ordina---
+    private static BigDecimal calcolaImporto(Carrello carrello) {
+        return carrello.getCarrelloProdottos().stream()
+                .map(cp -> cp.getProdotto().getPrezzo().multiply(BigDecimal.valueOf(cp.getQuantita())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }// Metodo per calcolare l'importo complessivo dei prodotti in un carrello
 
-    private BigDecimal calcolaImporto(Carrello carrello) {
-        BigDecimal importoTotale = BigDecimal.ZERO;
-        Set<CarrelloProdotto> prodottiNelCarrello = carrello.getCarrelloProdottos();
 
-        for (CarrelloProdotto carrelloProdotto : prodottiNelCarrello) {
-            BigDecimal prezzoProdotto = carrelloProdotto.getProdotto().getPrezzo();
-            int quantita = carrelloProdotto.getQuantita();
-            BigDecimal importoProdotto = prezzoProdotto.multiply(BigDecimal.valueOf(quantita));
-            importoTotale = importoTotale.add(importoProdotto);
-        }
-
-        return importoTotale;
-    } //---Calcolo Importo---
-
-    private static final Random RANDOM = new Random();
-
-    public boolean processaPagamento(MetodoDiPagamento metodoDiPagamento, BigDecimal amount) {
-        // Simulazione del processo di pagamento
-        // Integrazione con un servizio di pagamento
-
-        // Logica di esempio per simulare un pagamento
+    private boolean processaPagamento(MetodoDiPagamento metodoDiPagamento, BigDecimal amount) {
         System.out.println("Pagamento in corso con il metodo selezionato: " + metodoDiPagamento.getSelezione());
         System.out.println("Importo addebitato: " + amount);
 
-        // Simuliamo una probabilità di successo dell'80%
         boolean paymentSuccess = RANDOM.nextInt(100) < 80;
 
         if (paymentSuccess) {
-            System.out.println("Payment processed successfully.");
+            System.out.println("L'operazione di pagamento ha avuto successo!");
             return true;
         } else {
-            System.out.println("Payment failed.");
+            System.out.println("Pagamento non andato a buon fine.");
             return false;
         }
-    }
+    }// Metodo che simula il processamento di un pagamento
+
+
+
 }
