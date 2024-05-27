@@ -31,3 +31,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Caramella Beach Club is a project developed by me as part of the "Software Platforms and Web Development" course at UNICAL. It aims to provide a relaxing and comfortable experience for all beach lovers.
 
 Enjoy your time at Caramella Beach Club! 🏖️
+
+![5f350afd62d93-1597311741](https://github.com/daedalus812/CaramellaBeachClub_PSSW/assets/146168654/e304db39-4776-4bc5-8898-8a0508cb841c)
+
