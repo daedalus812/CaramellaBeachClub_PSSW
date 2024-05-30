@@ -1,3 +1,4 @@
+//CHECK DONE, OK!
 package org.ecommerce.caramellabeachclub.services;
 
 import org.ecommerce.caramellabeachclub.entities.*;
@@ -5,12 +6,10 @@ import org.ecommerce.caramellabeachclub.repositories.OrdineRepository;
 import org.ecommerce.caramellabeachclub.repositories.RecensioneRepository;
 import org.ecommerce.caramellabeachclub.repositories.UtenteRepository;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
+import org.ecommerce.caramellabeachclub.resources.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -22,7 +21,7 @@ public class RecensioneService {
     @Autowired
     private OrdineRepository ordineRepository;
 
-    public void aggiungiRecensione(Utente utente, Prodotto prodottoDaRecensire, String valutazione, String commento){
+    public void aggiungiRecensione(Utente u, Ordine o, Prodotto prodottoDaRecensire, String valutazione, String commento){
 
         // Verificare che l'utente abbia effettuato un ordine con all'interno un prodotto da recensire
         // altrimenti la recensione è da ritenersi fasulla
@@ -30,36 +29,53 @@ public class RecensioneService {
         // La logica è che un ordine si effettua su un carrello che contiene dei prodotti.
         // Se il carrello ordinato contiene il prodotto da recensire allora siamo apposto.
 
-        Recensione recensione = new Recensione();
-
-        Ordine ordine = ordineRepository.findByUtenteId(utente.getId());
-
-        // Mi prendo il carrello ordinato
-        Carrello carrello = ordine.getIdCarrello();
-
-        // Metto in un set tutti i "CarrelloProdotti" ordinati
-        Set<CarrelloProdotto> carrelloProdottos = carrello.getCarrelloProdottos();
-
-        // Creo una lista in cui ci saranno tutti i prodotti di quel carrello ordinato
-        ArrayList<Prodotto> prodottiOrdinati = new ArrayList<>();
-
-        for (CarrelloProdotto cp : carrelloProdottos){
-            prodottiOrdinati.add(cp.getProdotto());
+        // Eseguo una validazione dei parametri in ingresso
+        if (u == null || o == null || prodottoDaRecensire == null || valutazione == null || commento == null) {
+            throw new IllegalArgumentException("Dati inconsistenti!");
         }
 
-        for (Prodotto p : prodottiOrdinati){
-            if (!(p.equals(prodottoDaRecensire))){
-                throw new InvalidOperationException("Non puoi recensire un prodotto che non hai ordinato!");
+        // Eseguo un recupero e una validazione dell'utente dal database
+        Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
+        if (!utente.equals(u)) {
+            throw new InvalidOperationException("Dati inconsistenti! Aggiorna la pagina.");
+        }
+
+        // Recupero e validazione dell'ordine dal database
+        Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(() ->
+                new InvalidOperationException("Ordine non trovato"));
+        if (!ordine.equals(o)) {
+            throw new InvalidOperationException("Dati inconsistenti! Aggiorna la pagina.");
+        }
+
+        // Verifica che l'ordine appartenga all'utente specificato
+        if (!ordine.getUtente().equals(utente)) {
+            throw new InvalidOperationException("Operazione non valida: l'utente non è associato a questo ordine");
+        }
+
+        // Verifica che il prodotto da recensire sia presente nel carrello ordinato
+        Carrello carrello = ordine.getIdCarrello();
+        Set<CarrelloProdotto> prodottiNelCarrello = carrello.getCarrelloProdottos();
+
+        boolean prodottoTrovato = false;
+        for (CarrelloProdotto cp : prodottiNelCarrello){
+            if (cp.getProdotto().equals(prodottoDaRecensire)) {
+                prodottoTrovato = true;
+                break;
             }
         }
 
+        if (!prodottoTrovato) {
+            throw new InvalidOperationException("Non puoi recensire un prodotto che non hai ordinato!");
+        }
+
+        // Creazione della recensione e salvataggio nel database
+        Recensione recensione = new Recensione();
         recensione.setIdUtente(utente);
         recensione.setCommento(commento);
         recensione.setValutazione(valutazione);
         recensione.setData(Instant.now());
         recensione.setIdProdotto(prodottoDaRecensire);
         recensioneRepository.save(recensione);
-
     }
 
 }

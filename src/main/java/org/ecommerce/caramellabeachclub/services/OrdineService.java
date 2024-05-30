@@ -1,3 +1,4 @@
+//TO CHECK
 package org.ecommerce.caramellabeachclub.services;
 
 import org.ecommerce.caramellabeachclub.entities.Ordine;
@@ -6,6 +7,7 @@ import org.ecommerce.caramellabeachclub.entities.Transazione;
 import org.ecommerce.caramellabeachclub.entities.Utente;
 import org.ecommerce.caramellabeachclub.repositories.*;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
+import org.ecommerce.caramellabeachclub.resources.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +24,18 @@ public class OrdineService {
 
     @Autowired
     private ResoRepository resoRepository;
+    @Autowired
+    private UtenteRepository utenteRepository;
 
-    public void annullaOrdine(Utente utente, Ordine ordine, String motivo){
+    public void annullaOrdine(Utente u, Ordine o, String motivo){
+        Utente utente = utenteRepository.findById(u.getId()).orElse(null);
+        if (utente == null){ throw new UserNotFoundException(); }
+
+        Ordine ordine = ordineRepository.findById(o.getId()).orElse(null);
+        if (ordine == null){ throw new InvalidOperationException(); }
+
         if (!(ordine.getUtente().equals(utente))){
-            throw new InvalidOperationException("Impossibile procedere: l'utente non è associato a questo ordine");
+            throw new InvalidOperationException();
         }
 
         ordine.setStato("Annullato. Motivo: "+motivo);
@@ -72,14 +82,21 @@ public class OrdineService {
         }
     }
 
-    public void effettuaReso(Utente utente, Ordine ordine, String motivo) {
+    public void effettuaReso(Utente u, Ordine o, String motivo) {
+
+        Utente utente = utenteRepository.findById(u.getId()).orElse(null);
+        if (utente == null){ throw new UserNotFoundException(); }
+
+        Ordine ordine = ordineRepository.findById(o.getId()).orElse(null);
+        if (ordine == null){ throw new InvalidOperationException(); }
+
         if (!ordine.getUtente().equals(utente)) {
             throw new InvalidOperationException("Operazione non valida: l'utente non è associato a questo ordine");
         }
 
         // Verifica se l'ordine è già stato reso
         if (ordine.getStato().equals("Reso")) {
-            throw new InvalidOperationException("Questo ordine è già stato reso in precedenza");
+            throw new InvalidOperationException("Questo ordine è già stato reso");
         }
 
         // Creazione dell'oggetto Reso
