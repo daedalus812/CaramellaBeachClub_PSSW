@@ -64,8 +64,8 @@ public class CarrelloService {
         // al carrello: va ordinato affinché la disponibilità si riduca. Pertanto il controllo sulla disponibilità
         // di un oggetto che è già presente nel carrello, va fatta considerando la quantità selezionata + quella già presente
         // nel carrello
-        CarrelloProdotto aggiunta = carrelloProdottoRepository.findByCarrelloAndProdotto(carrello, prod)
-                .orElse(new CarrelloProdotto());
+        CarrelloProdotto aggiunta = carrelloProdottoRepository.findByCarrelloAndProdotto(carrello, prod);
+
 
         if (aggiunta.getId() != null) {
             int nuovaQuantita = aggiunta.getQuantita() + quantita;

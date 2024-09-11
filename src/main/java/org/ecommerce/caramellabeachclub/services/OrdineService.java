@@ -1,4 +1,4 @@
-//TO CHECK
+//CHECK DONE, OK!
 package org.ecommerce.caramellabeachclub.services;
 
 import org.ecommerce.caramellabeachclub.entities.Ordine;
@@ -24,21 +24,19 @@ public class OrdineService {
 
     @Autowired
     private ResoRepository resoRepository;
+
     @Autowired
     private UtenteRepository utenteRepository;
 
-    public void annullaOrdine(Utente u, Ordine o, String motivo){
-        Utente utente = utenteRepository.findById(u.getId()).orElse(null);
-        if (utente == null){ throw new UserNotFoundException(); }
+    public void annullaOrdine(Utente u, Ordine o, String motivo) {
+        Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
+        Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(InvalidOperationException::new);
 
-        Ordine ordine = ordineRepository.findById(o.getId()).orElse(null);
-        if (ordine == null){ throw new InvalidOperationException(); }
-
-        if (!(ordine.getUtente().equals(utente))){
+        if (!ordine.getUtente().equals(utente)) {
             throw new InvalidOperationException();
         }
 
-        ordine.setStato("Annullato. Motivo: "+motivo);
+        ordine.setStato("Annullato. Motivo: " + motivo);
         ordineRepository.save(ordine);
 
         // Si dà per scontato che effettuato l'ordine, il pagamento venga processato all'istante
@@ -52,13 +50,11 @@ public class OrdineService {
         // l'importo sia stato effettivamente pagato
 
         processaRimborso(ordine);
-
     }
 
     private boolean processaRimborso(Ordine ordine) {
         BigDecimal importoRimborso = calcolaImportoRimborso(ordine);
         return simulaRimborso(importoRimborso);
-
     }
 
     private BigDecimal calcolaImportoRimborso(Ordine ordine) {
@@ -83,19 +79,15 @@ public class OrdineService {
     }
 
     public void effettuaReso(Utente u, Ordine o, String motivo) {
-
-        Utente utente = utenteRepository.findById(u.getId()).orElse(null);
-        if (utente == null){ throw new UserNotFoundException(); }
-
-        Ordine ordine = ordineRepository.findById(o.getId()).orElse(null);
-        if (ordine == null){ throw new InvalidOperationException(); }
+        Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
+        Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(InvalidOperationException::new);
 
         if (!ordine.getUtente().equals(utente)) {
             throw new InvalidOperationException("Operazione non valida: l'utente non è associato a questo ordine");
         }
 
         // Verifica se l'ordine è già stato reso
-        if (ordine.getStato().equals("Reso")) {
+        if (ordine.getStato().equals("Reso Completato, rimborso effettuato.")) {
             throw new InvalidOperationException("Questo ordine è già stato reso");
         }
 
@@ -115,4 +107,22 @@ public class OrdineService {
         processaRimborso(ordine);
     }
 
+    public void annullaReso(Utente u, Ordine o, Reso r) {
+        Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
+        Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(InvalidOperationException::new);
+
+        if (!ordine.getUtente().equals(utente)) {
+            throw new InvalidOperationException("Operazione non valida: l'utente non è associato a questo ordine");
+        }
+
+        Reso reso = resoRepository.findById(r.getId()).orElseThrow(InvalidOperationException::new);
+
+        // Verifica se l'ordine è già stato reso
+        if (ordine.getStato().equals("Reso Completato, rimborso effettuato.")) {
+            throw new InvalidOperationException("Questo ordine è già stato reso");
+        }
+
+        reso.setStatoReso("Annullato");
+        resoRepository.save(reso);
+    }
 }

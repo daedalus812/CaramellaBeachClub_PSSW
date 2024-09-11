@@ -1,7 +1,2 @@
 To-Do List
-
-- Realizzare il "ProdottoService" (metodi come "aggiungi ai preferiti", "vedi oggetti simili", ...)
-- Realizzare il "ResoService" (metodi come "annulla reso", ....)
-- Realizzare il "SpedizioneService" (metodi come "traccia spedizione", ...)
-- Realizzare il "UtenteService" (gestione del Login, ...)
-- Realizzare i controller
+- Gestione del token jwt scaduto in JWTAuthenticationFilter.java

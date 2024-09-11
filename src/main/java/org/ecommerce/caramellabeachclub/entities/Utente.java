@@ -30,6 +30,9 @@ public class Utente {
     @Column(name = "cognome", nullable = false, length = 50)
     private String cognome;
 
+    @Column(name = "password", nullable = false, length = 12)
+    private String password;
+
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
@@ -44,5 +47,8 @@ public class Utente {
 
     @OneToMany(mappedBy = "idUtente")
     private Set<Recensione> recensiones = new LinkedHashSet<>();
+
+
+
 
 }
