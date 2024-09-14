@@ -23,7 +23,7 @@ public class Prodotto {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_categoria", nullable = false)
-    private Categoria idCategoria;
+    private Categoria categoria;
 
     @Column(name = "nome", nullable = false, length = 50)
     private String nome;

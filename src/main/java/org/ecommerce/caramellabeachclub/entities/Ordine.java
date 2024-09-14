@@ -19,8 +19,9 @@ public class Ordine {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_utente", nullable = false)
-    private Utente idUtente;
+    private Utente utente;  // Corretto da idUtente a utente
 
+    @Getter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_carrello", nullable = false, referencedColumnName = "id_carrello")
     private Carrello idCarrello;
@@ -37,13 +38,18 @@ public class Ordine {
     @OneToOne(mappedBy = "idOrdine")
     private Reso resos;
 
-    @OneToOne(mappedBy = "idOrdine")
+    @OneToOne(mappedBy = "ordine")
     private Spedizione spedizione;
 
-    @OneToOne(mappedBy = "idOrdine")
+    @OneToOne(mappedBy = "ordine")
     private Transazione transaziones;
 
-    @OneToOne(mappedBy = "idUtente")
-    private Utente utente;
+    public void setIdCarrello(Carrello carrello) {
+        this.idCarrello = idCarrello;
+    }
+
+    public void setIdUtente(Utente user) {
+        this.utente = user;
+    }
 
 }

@@ -4,29 +4,36 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.ecommerce.caramellabeachclub.entities.Carrello;
 
 @Data
 @Getter
 @Setter
 @Entity
 @Table(name = "carrello_prodotto")
+@IdClass(CarrelloProdottoId.class)
 public class CarrelloProdotto {
 
-    @MapsId("carrelloId")
+    @Id
+    @Column(name = "carrello_id")
+    private Integer carrelloId;
+
+    @Id
+    @Column(name = "prodotto_id")
+    private Integer prodottoId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "carrello_id", nullable = false, referencedColumnName = "id_carrello")
+    @JoinColumn(name = "carrello_id", insertable = false, updatable = false)
     private Carrello carrello;
 
-    @MapsId("prodottoId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "prodotto_id", nullable = false)
+    @JoinColumn(name = "prodotto_id", insertable = false, updatable = false)
     private Prodotto prodotto;
 
     @Column(name = "quantita")
     private Integer quantita;
-    @Getter
-    @Setter
-    @Id
-    private Integer id;
 
+    public String getId() {
+        return carrelloId + "-" + prodottoId;
+    }
 }

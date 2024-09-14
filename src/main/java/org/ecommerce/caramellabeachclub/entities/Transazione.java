@@ -22,7 +22,7 @@ public class Transazione {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_ordine", nullable = false)
-    private Ordine idOrdine;
+    private Ordine ordine;
 
     @Column(name = "data", nullable = false)
     private Instant data;
@@ -40,4 +40,7 @@ public class Transazione {
     @Column(name = "esito", nullable = false)
     private boolean esito;
 
+    public void setIdOrdine(Ordine ordine) {
+        this.ordine = ordine;
+    }
 }

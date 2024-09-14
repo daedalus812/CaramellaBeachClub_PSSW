@@ -19,11 +19,6 @@ public class Utente {
     @Column(name = "id_utente", nullable = false)
     private Integer id;
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_utente", nullable = false)
-    private Ordine ordine;
-
     @Column(name = "nome", nullable = false, length = 50)
     private String nome;
 
@@ -39,16 +34,13 @@ public class Utente {
     @Column(name = "telefono", length = 50)
     private String telefono;
 
-    @OneToOne(mappedBy = "idUtente")
+    @OneToOne(mappedBy = "utente")
     private Carrello carrello;
 
-    @OneToMany(mappedBy = "idUtente")
+    @OneToMany(mappedBy = "utente")  // Corretto da idUtente a utente
     private Set<Ordine> ordines = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "idUtente")
+    @OneToMany(mappedBy = "utente")
     private Set<Recensione> recensiones = new LinkedHashSet<>();
-
-
-
 
 }

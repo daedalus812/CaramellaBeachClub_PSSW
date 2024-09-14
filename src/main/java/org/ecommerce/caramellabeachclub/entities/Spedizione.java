@@ -22,7 +22,7 @@ public class Spedizione {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_ordine", nullable = false)
-    private Ordine idOrdine;
+    private Ordine ordine;
 
     @Column(name = "indirizzo_spedizione", nullable = false, length = 50)
     private String indirizzoSpedizione;

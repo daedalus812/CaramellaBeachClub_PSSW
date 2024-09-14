@@ -15,11 +15,14 @@ public class CarrelloController {
     @Autowired
     private CarrelloService carrelloService;
 
-    // Aggiungi un prodotto al carrello
+    // finocchio ricorda: aggiungi un prodotto al carrello
     @PostMapping("/aggiungi")
     public ResponseEntity<String> aggiungiAlCarrello(@RequestParam int idUtente,
                                                      @RequestBody Prodotto prodotto,
-                                                     @RequestParam int quantita) {
+                                                     @RequestParam int quantita,
+                                                    @RequestBody Carrello carrello
+    ) {
+
         try {
             carrelloService.aggiungiAlCarrello(idUtente, prodotto, quantita);
             return ResponseEntity.ok("Prodotto aggiunto al carrello con successo!");
@@ -28,7 +31,7 @@ public class CarrelloController {
         }
     }
 
-    // Incrementa la quantità di un prodotto nel carrello (Plus Adding)
+    // *fatto* (Plus Adding)
     @PutMapping("/incrementa")
     public ResponseEntity<String> incrementaQuantita(@RequestParam int idUtente,
                                                      @RequestBody CarrelloProdotto carrelloProdotto) {
@@ -40,7 +43,6 @@ public class CarrelloController {
         }
     }
 
-    // Rimuovi un prodotto dal carrello
     @DeleteMapping("/rimuovi")
     public ResponseEntity<String> rimuoviDalCarrello(@RequestParam int idUtente,
                                                      @RequestBody CarrelloProdotto carrelloProdotto) {
@@ -52,7 +54,6 @@ public class CarrelloController {
         }
     }
 
-    // Decrementa la quantità di un prodotto nel carrello (Minus Removing)
     @PutMapping("/decrementa")
     public ResponseEntity<String> decrementaQuantita(@RequestParam int idUtente,
                                                      @RequestBody CarrelloProdotto carrelloProdotto) {
@@ -64,7 +65,6 @@ public class CarrelloController {
         }
     }
 
-    // Svuota completamente il carrello
     @DeleteMapping("/svuota")
     public ResponseEntity<String> svuotaCarrello(@RequestParam int idUtente) {
         try {
@@ -75,7 +75,6 @@ public class CarrelloController {
         }
     }
 
-    // Effettua un ordine
     @PostMapping("/ordina")
     public ResponseEntity<String> effettuaOrdine(@RequestParam int idUtente,
                                                  @RequestBody MetodoDiPagamento metodoDiPagamento,

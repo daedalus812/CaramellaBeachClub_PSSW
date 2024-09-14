@@ -20,7 +20,7 @@ public class Carrello {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_utente", nullable = false)
-    private Utente idUtente;
+    private Utente utente;
 
     @OneToMany(mappedBy = "carrello")
     private Set<CarrelloProdotto> carrelloProdottos = new LinkedHashSet<>();

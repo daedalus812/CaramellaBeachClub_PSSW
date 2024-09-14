@@ -39,10 +39,10 @@ public class CarrelloService {
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
         // Recupera il carrello dell'utente o creane uno nuovo se non esiste
-        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
+        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
         if (carrello == null) {
             carrello = new Carrello();
-            carrello.setIdUtente(user);
+            carrello.setUtente(user);
             carrello = carrelloRepository.save(carrello);
         }
 
@@ -113,7 +113,7 @@ public class CarrelloService {
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
         // Recupera il carrello dell'utente
-        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
+        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
 
         // Verifica che il carrello del CarrelloProdotto corrisponda al carrello dell'utente
         if (!cp.getCarrello().equals(carrello)) {
@@ -131,7 +131,7 @@ public class CarrelloService {
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
         // Recupera il carrello dell'utente
-        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
+        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
 
         // Verifica che il carrello del CarrelloProdotto corrisponda al carrello dell'utente
         if (!cp.getCarrello().equals(carrello)) {
@@ -155,7 +155,7 @@ public class CarrelloService {
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
         // Recupera il carrello dell'utente
-        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
+        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
 
         carrelloProdottoRepository.deleteAll(carrello.getCarrelloProdottos());
         carrelloRepository.delete(carrello);
@@ -169,7 +169,7 @@ public class CarrelloService {
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
         // Recupera il carrello dell'utente
-        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
+        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
 
         // Creazione di un nuovo ordine e una nuova transazione
         Ordine ordine = new Ordine();

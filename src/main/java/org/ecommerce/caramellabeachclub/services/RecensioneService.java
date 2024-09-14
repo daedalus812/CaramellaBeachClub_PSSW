@@ -70,7 +70,7 @@ public class RecensioneService {
 
         // Creazione della recensione e salvataggio nel database
         Recensione recensione = new Recensione();
-        recensione.setIdUtente(utente);
+        recensione.setUtente(utente);
         recensione.setCommento(commento);
         recensione.setValutazione(valutazione);
         recensione.setData(Instant.now());

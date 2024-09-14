@@ -24,7 +24,7 @@ public class Recensione {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_utente", nullable = false)
-    private Utente idUtente;
+    private Utente utente;
 
     @Column(name = "valutazione", nullable = false, length = 50)
     private String valutazione;
