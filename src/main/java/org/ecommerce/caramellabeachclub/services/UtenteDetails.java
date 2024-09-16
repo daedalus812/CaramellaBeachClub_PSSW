@@ -2,8 +2,11 @@ package org.ecommerce.caramellabeachclub.services;
 
 import org.ecommerce.caramellabeachclub.entities.Utente;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
+import java.util.Collections;
 
 public class UtenteDetails implements UserDetails {
 
@@ -15,8 +18,8 @@ public class UtenteDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Definisci qui le autorizzazioni/ruoli, se ce ne sono
-        return null;
+        // Assegna sempre il ruolo "ROLE_CLIENTE"
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_CLIENTE"));
     }
 
     @Override

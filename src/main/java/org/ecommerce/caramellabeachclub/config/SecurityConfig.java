@@ -24,6 +24,7 @@ public class SecurityConfig {
         this.utenteDetailsService = utenteDetailsService;
     }
 
+
     // Metodo per configurare l'AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -33,18 +34,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Usa Customizer per disabilitare CSRF
+                .csrf(csrf -> csrf.disable()) // Disabilita CSRF
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/registrazione").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // Permetti tutte le richieste
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // Aggiungi il filtro JWT prima di UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -32,7 +32,7 @@ public class CarrelloService {
     private static final Random RANDOM = new Random();
 
     @Transactional
-    public void aggiungiAlCarrello(int idUtente, Prodotto p, int quantita)
+    public void aggiungiAlCarrello(int idUtente, int idProdotto, int quantita)
             throws UserNotFoundException, ProductNotFoundException, InvalidQuantityException {
 
         // Recupera l'utente dal database
@@ -48,7 +48,7 @@ public class CarrelloService {
 
         // La variabile prod serve affinché l'oggetto che il client mi passa venga prelevato
         // dal database, e che quindi esista.
-        Prodotto prod = prodottoRepository.findById(p.getId()).orElseThrow(ProductNotFoundException::new);
+        Prodotto prod = prodottoRepository.findById(idProdotto).orElseThrow(ProductNotFoundException::new);
 
         // Mi prendo la disponibilità dell'oggetto dal database, grazie alla metodo(query) di ProdottoRepository
         int disponibilitaProd = prodottoRepository.findDisponibilitaById(prod.getId());

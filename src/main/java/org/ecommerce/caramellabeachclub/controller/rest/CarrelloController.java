@@ -18,13 +18,13 @@ public class CarrelloController {
     // finocchio ricorda: aggiungi un prodotto al carrello
     @PostMapping("/aggiungi")
     public ResponseEntity<String> aggiungiAlCarrello(@RequestParam int idUtente,
-                                                     @RequestBody Prodotto prodotto,
+                                                     @RequestParam int idProdotto,
                                                      @RequestParam int quantita,
                                                     @RequestBody Carrello carrello
     ) {
 
         try {
-            carrelloService.aggiungiAlCarrello(idUtente, prodotto, quantita);
+            carrelloService.aggiungiAlCarrello(idUtente, idProdotto, quantita);
             return ResponseEntity.ok("Prodotto aggiunto al carrello con successo!");
         } catch (UserNotFoundException | ProductNotFoundException | InvalidQuantityException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
