@@ -25,7 +25,7 @@ public class Utente {
     @Column(name = "cognome", nullable = false, length = 50)
     private String cognome;
 
-    @Column(name = "password", nullable = false, length = 12)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     @Column(name = "email", nullable = false, length = 50)
@@ -37,7 +37,7 @@ public class Utente {
     @OneToOne(mappedBy = "utente")
     private Carrello carrello;
 
-    @OneToMany(mappedBy = "utente")  // Corretto da idUtente a utente
+    @OneToMany(mappedBy = "utente")
     private Set<Ordine> ordines = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "utente")

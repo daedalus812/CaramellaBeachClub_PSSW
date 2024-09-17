@@ -1,5 +1,7 @@
-package org.ecommerce.caramellabeachclub.controllers;
+package org.ecommerce.caramellabeachclub.controller.rest;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.ecommerce.caramellabeachclub.entities.Recensione;
 import org.ecommerce.caramellabeachclub.entities.Ordine;
 import org.ecommerce.caramellabeachclub.entities.Prodotto;
@@ -28,7 +30,7 @@ public class RecensioneController {
     @PostMapping("/aggiungi")
     public ResponseEntity<String> aggiungiRecensione(@RequestBody RecensioneRequest request) {
         try {
-            recensioneService.aggiungiRecensione(request.getUtente(), request.getOrdine(),
+            recensioneService.aggiungiRecensione(request.getUtente().getId(), request.getOrdine().getId(),
                     request.getProdotto(), request.getValutazione(), request.getCommento());
             return ResponseEntity.ok("Recensione aggiunta con successo.");
         } catch (UserNotFoundException e) {
@@ -82,6 +84,8 @@ public class RecensioneController {
     }
 
     // Classe interna per gestire i parametri della richiesta
+    @Setter
+    @Getter
     public static class RecensioneRequest {
         private Utente utente;
         private Ordine ordine;
@@ -89,46 +93,5 @@ public class RecensioneController {
         private String valutazione;
         private String commento;
 
-        // Getters e Setters
-
-        public Utente getUtente() {
-            return utente;
-        }
-
-        public void setUtente(Utente utente) {
-            this.utente = utente;
-        }
-
-        public Ordine getOrdine() {
-            return ordine;
-        }
-
-        public void setOrdine(Ordine ordine) {
-            this.ordine = ordine;
-        }
-
-        public Prodotto getProdotto() {
-            return prodotto;
-        }
-
-        public void setProdotto(Prodotto prodotto) {
-            this.prodotto = prodotto;
-        }
-
-        public String getValutazione() {
-            return valutazione;
-        }
-
-        public void setValutazione(String valutazione) {
-            this.valutazione = valutazione;
-        }
-
-        public String getCommento() {
-            return commento;
-        }
-
-        public void setCommento(String commento) {
-            this.commento = commento;
-        }
     }
 }

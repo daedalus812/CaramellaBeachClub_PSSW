@@ -22,4 +22,14 @@ public class MetodoDiPagamento {
     @OneToMany(mappedBy = "metodoDiPagamento")
     private Set<Transazione> transaziones = new LinkedHashSet<>();
 
+    /*
+
+    La relazione Many-to-One tra MetodoDiPagamento e Transazione la considero appropriata,
+    dato che un metodo di pagamento può essere utilizzato in molte transazioni.
+    Anche se normalmente un ordine potrebbe generare una sola transazione,
+    mantenere la relazione Many-to-One mi offre maggiore flessibilità e
+    mi consente di gestire più transazioni associate a un metodo di pagamento.
+
+    */
+
 }

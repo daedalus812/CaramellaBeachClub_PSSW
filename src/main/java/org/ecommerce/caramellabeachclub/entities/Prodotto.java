@@ -31,7 +31,8 @@ public class Prodotto {
     @Column(name = "descrizione", length = 50)
     private String descrizione;
 
-    @Column(name = "prezzo", nullable = false, precision = 50)
+    @Column(name = "prezzo", nullable = false, precision = 10, scale = 2)
+    // precision= 10, scale= 2  | per rappresentare correttamente i valori monetari, es. 49.99€
     private BigDecimal prezzo;
 
     @OneToMany(mappedBy = "prodotto")

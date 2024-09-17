@@ -1,11 +1,14 @@
 //CHECK DONE, OK!
 package org.ecommerce.caramellabeachclub.services;
 
+import jakarta.persistence.LockModeType;
 import org.ecommerce.caramellabeachclub.entities.*;
 import org.ecommerce.caramellabeachclub.repositories.*;
 import org.ecommerce.caramellabeachclub.resources.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -36,6 +39,9 @@ public class CarrelloService {
             throws UserNotFoundException, ProductNotFoundException, InvalidQuantityException {
 
         // Recupera l'utente dal database
+        // il carrello a cui aggiungere il prodotto te lo trovi tramite l'utente
+        // poichè ad ogni utente è associato un solo carrello
+
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
         // Recupera il carrello dell'utente o creane uno nuovo se non esiste
@@ -47,7 +53,7 @@ public class CarrelloService {
         }
 
         // La variabile prod serve affinché l'oggetto che il client mi passa venga prelevato
-        // dal database, e che quindi esista.
+        // dal database, e che quindi esista e sia valido
         Prodotto prod = prodottoRepository.findById(idProdotto).orElseThrow(ProductNotFoundException::new);
 
         // Mi prendo la disponibilità dell'oggetto dal database, grazie alla metodo(query) di ProdottoRepository
@@ -55,7 +61,8 @@ public class CarrelloService {
 
         // Verifico che la quantità desiderata sia disponibile (secondo la quantità che il database mi dà)
         if (quantita > disponibilitaProd) {
-            throw new InvalidQuantityException("Impossibile aggiungere al carrello: il prodotto non è disponibile per la quantità desiderata");
+            throw new InvalidQuantityException("Impossibile aggiungere al carrello: " +
+                    "il prodotto non è disponibile per la quantità desiderata");
         }
 
         // Ipotizziamo che l'aggiunta si trovi già all'interno del carrello
@@ -70,7 +77,8 @@ public class CarrelloService {
         if (aggiunta.getId() != null) {
             int nuovaQuantita = aggiunta.getQuantita() + quantita;
             if (nuovaQuantita > disponibilitaProd) {
-                throw new InvalidQuantityException("Impossibile aggiungere al carrello: il prodotto non è disponibile per la quantità desiderata");
+                throw new InvalidQuantityException("Impossibile aggiungere al carrello: " +
+                        "il prodotto non è disponibile per la quantità desiderata");
             }
             aggiunta.setQuantita(nuovaQuantita);
         } else {
@@ -161,7 +169,8 @@ public class CarrelloService {
         carrelloRepository.delete(carrello);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     public void ordina(int idUtente, MetodoDiPagamento metodoDiPagamento, String indirizzoSpedizione)
             throws UserNotFoundException, InvalidOperationException {
 

@@ -25,7 +25,7 @@ public class Carrello {
     @OneToMany(mappedBy = "carrello")
     private Set<CarrelloProdotto> carrelloProdottos = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "idCarrello")
-    private Set<Ordine> ordines = new LinkedHashSet<>();
+    @OneToOne(mappedBy = "carrello")
+    private Ordine ordine;
 
 }

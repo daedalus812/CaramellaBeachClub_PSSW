@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.ecommerce.caramellabeachclub.entities.Carrello;
 
 @Data
 @Getter
@@ -13,6 +12,8 @@ import org.ecommerce.caramellabeachclub.entities.Carrello;
 @Table(name = "carrello_prodotto")
 @IdClass(CarrelloProdottoId.class)
 public class CarrelloProdotto {
+
+    // Non utilizzo la @EmbeddedID, voglio evitare il Warning
 
     @Id
     @Column(name = "carrello_id")

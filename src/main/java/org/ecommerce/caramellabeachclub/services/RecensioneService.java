@@ -21,7 +21,7 @@ public class RecensioneService {
     @Autowired
     private OrdineRepository ordineRepository;
 
-    public void aggiungiRecensione(Utente u, Ordine o, Prodotto prodottoDaRecensire, String valutazione, String commento){
+    public void aggiungiRecensione(Integer ute, Integer ord, Prodotto prodottoDaRecensire, String valutazione, String commento){
 
         // Verificare che l'utente abbia effettuato un ordine con all'interno un prodotto da recensire
         // altrimenti la recensione è da ritenersi fasulla
@@ -30,20 +30,21 @@ public class RecensioneService {
         // Se il carrello ordinato contiene il prodotto da recensire allora siamo apposto.
 
         // Eseguo una validazione dei parametri in ingresso
-        if (u == null || o == null || prodottoDaRecensire == null || valutazione == null || commento == null) {
+        if (ute == null || ord == null || prodottoDaRecensire == null || valutazione == null || commento == null) {
             throw new IllegalArgumentException("Dati inconsistenti!");
         }
 
+
         // Eseguo un recupero e una validazione dell'utente dal database
-        Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
-        if (!utente.equals(u)) {
+        Utente utente = utenteRepository.findById(ute).orElseThrow(UserNotFoundException::new);
+        if (!utente.getId().equals(ute)) {
             throw new InvalidOperationException("Dati inconsistenti! Aggiorna la pagina.");
         }
 
         // Recupero e validazione dell'ordine dal database
-        Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(() ->
+        Ordine ordine = ordineRepository.findById(ord).orElseThrow(() ->
                 new InvalidOperationException("Ordine non trovato"));
-        if (!ordine.equals(o)) {
+        if (!ordine.getId().equals(ord)) {
             throw new InvalidOperationException("Dati inconsistenti! Aggiorna la pagina.");
         }
 

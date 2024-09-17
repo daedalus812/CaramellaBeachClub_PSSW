@@ -1,43 +1,38 @@
 package org.ecommerce.caramellabeachclub.controller.rest;
 
-import org.ecommerce.caramellabeachclub.entities.Utente;
-import org.ecommerce.caramellabeachclub.models.AuthenticationResponse;
-import org.ecommerce.caramellabeachclub.security.JwtUtil;
-import org.ecommerce.caramellabeachclub.services.UtenteDetailsService;
+import org.ecommerce.caramellabeachclub.services.UtenteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/utenti")
 public class UtenteController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private UtenteService utenteService;
 
-    @Autowired
-    private UtenteDetailsService utenteDetailsService;
-
-    // Endpoint per il login
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body("Credenziali non valide");
-        }
-
-        final UserDetails userDetails = utenteDetailsService.loadUserByUsername(email);
-        final String jwt = jwtUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+    @GetMapping
+    public ResponseEntity<String> getAllUtenti() {
+        // Logica per restituire tutti gli utenti
+        return new ResponseEntity<>("Lista utenti", HttpStatus.OK);
     }
 
-    // Altri endpoint...
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
+        try {
+            boolean credenzialiValide = utenteService.verificaCredenziali(email, password);
+
+            if (credenzialiValide) {
+                return new ResponseEntity<>("Login avvenuto con successo!", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Credenziali non valide!", HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("Errore durante il login.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
