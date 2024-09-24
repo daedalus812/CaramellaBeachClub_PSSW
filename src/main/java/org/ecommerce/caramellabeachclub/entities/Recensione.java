@@ -35,4 +35,5 @@ public class Recensione {
     @Column(name = "data", nullable = false)
     private Instant data;
 
+
 }

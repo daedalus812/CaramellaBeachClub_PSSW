@@ -34,8 +34,6 @@ public class Utente {
     @Column(name = "telefono", length = 50)
     private String telefono;
 
-    @OneToOne(mappedBy = "utente")
-    private Carrello carrello;
 
     @OneToMany(mappedBy = "utente")
     private Set<Ordine> ordines = new LinkedHashSet<>();

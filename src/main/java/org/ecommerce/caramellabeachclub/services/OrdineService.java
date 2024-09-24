@@ -78,6 +78,8 @@ public class OrdineService {
         }
     }
 
+    // Comunque potrei anche considerare il reso come un'azione asincrona,
+    // simulando un tempo di elaborazione. Potrebbe essere gestito via un task schedulato in futuro (Se Dio vuole)
     public void effettuaReso(Utente u, Ordine o, String motivo) {
         Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
         Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(InvalidOperationException::new);

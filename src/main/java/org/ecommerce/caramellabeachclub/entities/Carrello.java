@@ -22,10 +22,9 @@ public class Carrello {
     @JoinColumn(name = "id_utente", nullable = false)
     private Utente utente;
 
-    @OneToMany(mappedBy = "carrello")
+    @OneToMany(mappedBy = "carrello", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<CarrelloProdotto> carrelloProdottos = new LinkedHashSet<>();
 
-    @OneToOne(mappedBy = "carrello")
-    private Ordine ordine;
+
 
 }

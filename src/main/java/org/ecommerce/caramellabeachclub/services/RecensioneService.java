@@ -1,82 +1,66 @@
-//CHECK DONE, OK!
 package org.ecommerce.caramellabeachclub.services;
 
-import org.ecommerce.caramellabeachclub.entities.*;
-import org.ecommerce.caramellabeachclub.repositories.OrdineRepository;
+import org.ecommerce.caramellabeachclub.entities.Recensione;
+import org.ecommerce.caramellabeachclub.entities.Prodotto;
+import org.ecommerce.caramellabeachclub.entities.Utente;
 import org.ecommerce.caramellabeachclub.repositories.RecensioneRepository;
+import org.ecommerce.caramellabeachclub.repositories.ProdottoRepository;
 import org.ecommerce.caramellabeachclub.repositories.UtenteRepository;
-import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
-import org.ecommerce.caramellabeachclub.resources.exceptions.UserNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.Instant;
-import java.util.Set;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecensioneService {
-    @Autowired
-    RecensioneRepository recensioneRepository;
-    @Autowired
-    private UtenteRepository utenteRepository;
-    @Autowired
-    private OrdineRepository ordineRepository;
 
-    public void aggiungiRecensione(Integer ute, Integer ord, Prodotto prodottoDaRecensire, String valutazione, String commento){
+    private final RecensioneRepository recensioneRepository;
+    private final ProdottoRepository prodottoRepository;
+    private final UtenteRepository utenteRepository;
 
-        // Verificare che l'utente abbia effettuato un ordine con all'interno un prodotto da recensire
-        // altrimenti la recensione è da ritenersi fasulla
+    public RecensioneService(RecensioneRepository recensioneRepository, ProdottoRepository prodottoRepository, UtenteRepository utenteRepository) {
+        this.recensioneRepository = recensioneRepository;
+        this.prodottoRepository = prodottoRepository;
+        this.utenteRepository = utenteRepository;
+    }
 
-        // La logica è che un ordine si effettua su un carrello che contiene dei prodotti.
-        // Se il carrello ordinato contiene il prodotto da recensire allora siamo apposto.
+    // Salva una recensione
+    public Recensione saveRecensione(Integer prodottoId, Integer utenteId, String valutazione, String commento) {
+        Optional<Prodotto> prodotto = prodottoRepository.findById(prodottoId);
+        Optional<Utente> utente = utenteRepository.findById(utenteId);
 
-        // Eseguo una validazione dei parametri in ingresso
-        if (ute == null || ord == null || prodottoDaRecensire == null || valutazione == null || commento == null) {
-            throw new IllegalArgumentException("Dati inconsistenti!");
+        if (prodotto.isPresent() && utente.isPresent()) {
+            Recensione recensione = new Recensione();
+            recensione.setIdProdotto(prodotto.get());
+            recensione.setUtente(utente.get());
+            recensione.setValutazione(valutazione);
+            recensione.setCommento(commento);
+            recensione.setData(Instant.now());
+            return recensioneRepository.save(recensione);
+        } else {
+            throw new IllegalArgumentException("Prodotto o utente non trovati");
         }
+    }
 
-
-        // Eseguo un recupero e una validazione dell'utente dal database
-        Utente utente = utenteRepository.findById(ute).orElseThrow(UserNotFoundException::new);
-        if (!utente.getId().equals(ute)) {
-            throw new InvalidOperationException("Dati inconsistenti! Aggiorna la pagina.");
+    // Recupera tutte le recensioni per un prodotto
+    public List<Recensione> getRecensioniByProdotto(Integer prodottoId) {
+        Optional<Prodotto> prodotto = prodottoRepository.findById(prodottoId);
+        if (prodotto.isPresent()) {
+            return recensioneRepository.findByIdProdotto(prodotto.get());
+        } else {
+            throw new IllegalArgumentException("Prodotto non trovato");
         }
+    }
 
-        // Recupero e validazione dell'ordine dal database
-        Ordine ordine = ordineRepository.findById(ord).orElseThrow(() ->
-                new InvalidOperationException("Ordine non trovato"));
-        if (!ordine.getId().equals(ord)) {
-            throw new InvalidOperationException("Dati inconsistenti! Aggiorna la pagina.");
+    // Recupera tutte le recensioni di un utente
+    public List<Recensione> getRecensioniByUtente(Integer utenteId) {
+        Optional<Utente> utente = utenteRepository.findById(utenteId);
+        if (utente.isPresent()) {
+            return recensioneRepository.findByUtente(utente.get());
+        } else {
+            throw new IllegalArgumentException("Utente non trovato");
         }
-
-        // Verifica che l'ordine appartenga all'utente specificato
-        if (!ordine.getUtente().equals(utente)) {
-            throw new InvalidOperationException("Operazione non valida: l'utente non è associato a questo ordine");
-        }
-
-        // Verifica che il prodotto da recensire sia presente nel carrello ordinato
-        Carrello carrello = ordine.getIdCarrello();
-        Set<CarrelloProdotto> prodottiNelCarrello = carrello.getCarrelloProdottos();
-
-        boolean prodottoTrovato = false;
-        for (CarrelloProdotto cp : prodottiNelCarrello){
-            if (cp.getProdotto().equals(prodottoDaRecensire)) {
-                prodottoTrovato = true;
-                break;
-            }
-        }
-
-        if (!prodottoTrovato) {
-            throw new InvalidOperationException("Non puoi recensire un prodotto che non hai ordinato!");
-        }
-
-        // Creazione della recensione e salvataggio nel database
-        Recensione recensione = new Recensione();
-        recensione.setUtente(utente);
-        recensione.setCommento(commento);
-        recensione.setValutazione(valutazione);
-        recensione.setData(Instant.now());
-        recensione.setIdProdotto(prodottoDaRecensire);
-        recensioneRepository.save(recensione);
     }
 
 }
