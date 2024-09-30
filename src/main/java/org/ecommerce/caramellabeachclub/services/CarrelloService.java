@@ -1,19 +1,19 @@
-//CHECK DONE, OK!
 package org.ecommerce.caramellabeachclub.services;
 
 import jakarta.persistence.LockModeType;
+import org.ecommerce.caramellabeachclub.entities.ProdottiOrdinati;
 import org.ecommerce.caramellabeachclub.entities.*;
 import org.ecommerce.caramellabeachclub.repositories.*;
 import org.ecommerce.caramellabeachclub.resources.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
@@ -37,22 +37,30 @@ public class CarrelloService {
     private static final Random RANDOM = new Random();
     @Autowired
     private MetodoDiPagamentoRepository metodoDiPagamentoRepository;
+    @Autowired
+    private OrdineRepository ordineRepository;
+    @Autowired
+    private TransazioneRepository transazioneRepository;
+    @Autowired
+    private SpedizioneRepository spedizioneRepository;
+    @Autowired
+    private ProdottiOrdinatiRepository prodottiOrdinatiRepository;
 
     @Transactional
     public void aggiungiAlCarrello(int idUtente, int idProdotto, int quantita)
             throws UserNotFoundException, ProductNotFoundException, InvalidQuantityException {
 
-        // Recupera l'utente dal database
-        // il carrello a cui aggiungere il prodotto te lo trovi tramite l'utente
+        // Recupera l'utente dal database.
+        // Il carrello a cui aggiungere il prodotto te lo trovi tramite l'utente
         // poichè ad ogni utente è associato un solo carrello
 
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
         // Recupera il carrello dell'utente o creane uno nuovo se non esiste
-        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
         if (carrello == null) {
             carrello = new Carrello();
-            carrello.setUtente(user);
+            carrello.setIdUtente(user.getId());
             carrello = carrelloRepository.save(carrello);
         }
 
@@ -73,9 +81,8 @@ public class CarrelloService {
         // Ciò che faremo è sommare la quantità selezionata a quella già presente nel carrello
         // La disponibilità di un oggetto x (visibile ad altri utenti) non verrà ridotta solo perché si è aggiunto
         // al carrello: va ordinato affinché la disponibilità si riduca. Pertanto il controllo sulla disponibilità
-        // di un oggetto che è già presente nel carrello, va fatta considerando la quantità selezionata + quella già presente
-        // nel carrello
-
+        // di un oggetto che è già presente nel carrello, va fatta considerando la quantità selezionata + quella già
+        // presente nel carrello
 
         // Mi prendo i prodotti già esistenti nel carrello e verifico che non si trovi già ciò che voglio aggiunere
         // In tal caso aggiorno la quantità nel carrello di quel prodotto con quella desiderata
@@ -103,7 +110,6 @@ public class CarrelloService {
                 carrelloProdottoRepository.save(aggiunta);
                 carrelloRepository.save(carrello);
             }
-
     }
 
     @Transactional
@@ -115,9 +121,11 @@ public class CarrelloService {
         }
 
         CarrelloProdotto cp = carrelloProdottoRepository.findByCarrelloAndProdottoId
-                (carrelloRepository.findByUtenteId(idUtente), idProdotto);
+                (carrelloRepository.findByIdUtente(idUtente), idProdotto);
+
         // Il plusAdding avviene direttamente da un carrello, quindi si presume che il prodotto sia già nel carrello,
         // ma un controllino non fa male
+
         if (carrelloProdottoRepository.existsByCarrelloAndProdotto(cp.getCarrello(), cp.getProdotto())) {
             Prodotto prod = prodottoRepository.findById(cp.getProdotto().getId()).orElseThrow(ProductNotFoundException::new);
             int disponibilitaProd = prodottoRepository.findDisponibilitaById(prod.getId());
@@ -126,7 +134,6 @@ public class CarrelloService {
                 throw new InvalidQuantityException("Impossibile aggiungere al carrello: " +
                         "il prodotto non è disponibile per la quantità desiderata");
             }
-
             cp.setQuantita(cp.getQuantita() + 1);
             carrelloProdottoRepository.save(cp);
         } else {
@@ -142,22 +149,21 @@ public class CarrelloService {
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
         // Recupero il carrello dell'utente
-        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
         if (carrello == null) {
             throw new InvalidOperationException("Il carrello dell'utente non è stato trovato.");
         }
 
-        // Trova l'elemento del carrello basato sul prodotto
+        // Trovo l'elemento del carrello basato sul prodotto
         CarrelloProdotto cp = carrelloProdottoRepository.findByCarrelloAndProdottoId(carrello, prodottoID);
         if (cp == null) {
             throw new InvalidOperationException("Il prodotto non è presente nel carrello.");
         }
 
-        // Rimuovi il prodotto dal carrello
-        cp.setQuantita(0);
-        carrelloProdottoRepository.delete(cp); // Elimina direttamente dal repository
+        // Rimuovo il prodotto dal carrello
+        cp.setQuantita(0); // non si sa mai...
+        carrelloProdottoRepository.delete(cp);
 
-        // Salva le modifiche al carrello
         carrelloRepository.save(carrello);
     }
 
@@ -166,22 +172,19 @@ public class CarrelloService {
     public void minusRemoving(int idUtente, int idProdotto)
             throws UserNotFoundException, InvalidOperationException {
 
-        // Recupera l'utente dal database
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
-        // Recupera il carrello dell'utente
-        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
 
         CarrelloProdotto cp = carrelloProdottoRepository.findByCarrelloAndProdottoId
-                (carrelloRepository.findByUtenteId(idUtente), idProdotto);
+                (carrelloRepository.findByIdUtente(idUtente), idProdotto);
 
-
-        // Verifica che il carrello del CarrelloProdotto corrisponda al carrello dell'utente
         if (!cp.getCarrello().equals(carrello)) {
             throw new InvalidOperationException("Operazione non valida: il carrello non corrisponde");
         }
 
         // Se la quantità è maggiore di 1, decrementa la quantità
+        // sennò lo togli direttamente
         if (cp.getQuantita() > 1) {
             cp.setQuantita(cp.getQuantita() - 1);
             carrelloProdottoRepository.save(cp);
@@ -192,16 +195,12 @@ public class CarrelloService {
 
     @Transactional
     public void svuotaCarrello(int idUtente) throws UserNotFoundException {
-        // Recupero l'utente dal database
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
-        // Recupero il carrello dell'utente
-        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
 
-        // Rimuovo solo i prodotti dal carrello di questo utente
         carrelloProdottoRepository.deleteAllByCarrello(carrello);
 
-        // Aggiorno il carrello (opzionale, dipende da cosa serve nel tuo contesto)
         carrelloRepository.save(carrello);
     }
 
@@ -211,11 +210,9 @@ public class CarrelloService {
     public void ordina(int idUtente, int metodoDiPagamento, String indirizzoSpedizione)
             throws UserNotFoundException, InvalidOperationException {
 
-        // Recupero l'utente dal database
         Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
 
-        // Recupero il carrello dell'utente
-        Carrello carrello = carrelloRepository.findByUtenteId(user.getId());
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
         Set<CarrelloProdotto> prodottiUser = carrelloProdottoRepository.findByCarrelloId(carrello.getIdCarrello());
 
         if (prodottiUser.isEmpty()) {
@@ -225,29 +222,32 @@ public class CarrelloService {
 
         // Creazione di un nuovo ordine e una nuova transazione
         Ordine ordine = new Ordine();
+
         Transazione transazione = new Transazione();
 
         MetodoDiPagamento met = metodoDiPagamentoRepository.findById(metodoDiPagamento);
 
+        ordine.setIdCarrello(carrello.getIdCarrello()); // Preso dal db e corrispondente all'utente che ha cliccato
+        ordine.setIdUtente(user.getId());;
 
-        ordine.setIdCarrello(carrello); // Preso dal db e corrispondente all'utente che ha cliccato
-        ordine.setIdUtente(user);
         ordine.setOra(LocalTime.now());
+        ordine.setData(LocalDateTime.now());
         ordine.setStato("Processamento in corso...");
+        ordineRepository.save(ordine);
 
         transazione.setMetodoDiPagamento(met);
-        transazione.setIdOrdine(ordine);
+        transazione.setIdOrdine(ordine.getId());
         transazione.setOra(LocalTime.now());
         transazione.setData(Instant.now());
-        transazione.setImporto(calcolaImporto(carrello));
+        transazione.setImporto(calcolaImporto(prodottiUser));
 
         Spedizione spedizione = new Spedizione();
+        spedizione.setIdOrdine(ordine.getId());
         spedizione.setIndirizzoSpedizione(indirizzoSpedizione);
 
         // Assumo che la spedizione avvenga fra 7 giorni (simulazione)
         spedizione.setDataPrevista(Instant.now().plus(7, ChronoUnit.DAYS));
         spedizione.setStato("In corso...");
-
 
         boolean esitoPagamento = processaPagamento(met, transazione.getImporto());
 
@@ -255,35 +255,98 @@ public class CarrelloService {
             transazione.setEsito(true);
             ordine.setStato("Pagamento completato");
             svuotaCarrello(idUtente);
+
         } else {
             transazione.setEsito(false);
             ordine.setStato("Pagamento fallito");
+            throw new InvalidOperationException();
         }
+
+        // Faccio sto discorso perché poi, quando dovrò aggiungere una recensione,
+        // la aggiungerò su un prodotto che è stato ordinato, sennò dove me lo piglio l'id del prodotto
+        // che è stato ordinato? L'ordine mica lo contiene? Il carrello viene svuotato in seguito ad un ordine
+        // andado a buon fine... quindi ma fazzu nto panaru se non faccio la roba seguente
+
+        for (CarrelloProdotto cp : prodottiUser){
+            ProdottiOrdinati po = new ProdottiOrdinati();
+            po.setIdProdotto(cp.getProdottoId());
+            po.setIdUtente(user.getId());
+            po.setIdOrdine(ordine.getId());
+            prodottiOrdinatiRepository.save(po);
+        }
+
+        transazioneRepository.save(transazione);
+        spedizioneRepository.save(spedizione);
+        ordineRepository.save(ordine);
     }
 
-    private static BigDecimal calcolaImporto(Carrello carrello) {
-        return carrello.getCarrelloProdottos().stream()
-                .map(cp -> {
-                    BigDecimal prezzo = cp.getProdotto().getPrezzo();
-                    BigDecimal quantita = BigDecimal.valueOf(cp.getQuantita());
-                    return prezzo.multiply(quantita);
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    private static BigDecimal calcolaImporto(Set<CarrelloProdotto> prodottiUser) {
+        BigDecimal totale = BigDecimal.ZERO;
+
+        System.out.println("Calcolo dell'importo totale per il carrello...");
+
+        // Controlla se il carrello ha prodotti
+        if (prodottiUser == null || prodottiUser.isEmpty()) {
+            System.out.println("Errore: il carrello è vuoto o non contiene prodotti.");
+            return totale; // che mi da zero
+        }
+
+        for (CarrelloProdotto cp : prodottiUser) {
+            Prodotto prodotto = cp.getProdotto();
+            BigDecimal prezzo = prodotto.getPrezzo();
+            int quantita = cp.getQuantita();
+
+            // Debug
+            System.out.println("Prodotto: " + prodotto.getNome());
+            System.out.println("Prezzo: " + prezzo);
+            System.out.println("Quantità: " + quantita);
+
+            // Controllo validità del prezzo e della quantità
+            if (prezzo == null || prezzo.compareTo(BigDecimal.ZERO) <= 0) {
+                System.out.println("Errore: prezzo del prodotto " + prodotto.getNome() + " non valido.");
+                throw new IllegalArgumentException("Prezzo del prodotto " + prodotto.getNome() + " non valido.");
+            }
+            if (quantita <= 0) {
+                System.out.println("Errore: quantità del prodotto " + prodotto.getNome() + " non valida.");
+                throw new IllegalArgumentException("Quantità del prodotto " + prodotto.getNome() + " non valida.");
+            }
+
+            // Calcolo del costo per il prodotto e aggiunta al totale
+            BigDecimal costoProdotto = prezzo.multiply(BigDecimal.valueOf(quantita));
+            System.out.println("Costo per il prodotto: " + costoProdotto);
+            totale = totale.add(costoProdotto);
+        }
+
+        System.out.println("Totale calcolato: " + totale);
+        return totale;
     }
 
+    // Sti qua, alla fin fine, sono tutti metodini di simulazione
     private boolean processaPagamento(MetodoDiPagamento metodoDiPagamento, BigDecimal amount) {
+
+        if (metodoDiPagamento == null) {
+            System.out.println("Errore: nessun metodo di pagamento selezionato.");
+            return false;
+        }
+
+        // Controllo sull'importo
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            System.out.println("Errore: importo non valido. Valore importo: " + amount);
+            return false;
+        }
+
         System.out.println("Pagamento in corso con il metodo selezionato: " + metodoDiPagamento.getSelezione());
-        System.out.println("Importo addebitato: " + amount);
+        System.out.println("Importo da pagare: " + amount);
 
-        // Simulazione del successo del pagamento con una probabilità dell'80%
-        boolean paymentSuccess = RANDOM.nextInt(100) < 80;
+        boolean pagamentoRiuscito = RANDOM.nextInt(100) < 80;
 
-        if (paymentSuccess) {
-            System.out.println("L'operazione di pagamento ha avuto successo!");
+        if (pagamentoRiuscito) {
+            System.out.println("Pagamento effettuato con successo!");
             return true;
         } else {
-            System.out.println("Pagamento non andato a buon fine.");
+            System.out.println("Pagamento fallito.");
             return false;
         }
     }
+
 }

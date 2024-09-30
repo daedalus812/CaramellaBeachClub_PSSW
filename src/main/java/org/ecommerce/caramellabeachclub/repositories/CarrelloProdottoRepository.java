@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.Set;
 
 @Repository
@@ -19,7 +18,6 @@ public interface CarrelloProdottoRepository extends JpaRepository<CarrelloProdot
 
     @Query("SELECT cp FROM CarrelloProdotto cp WHERE cp.carrello.idCarrello = :idCarrello")
     Set<CarrelloProdotto> findByCarrelloId(@Param("idCarrello") int idCarrello);
-
 
     void deleteAllByCarrello(Carrello carrello);
 }

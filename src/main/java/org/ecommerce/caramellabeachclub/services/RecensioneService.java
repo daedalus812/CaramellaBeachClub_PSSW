@@ -1,66 +1,69 @@
 package org.ecommerce.caramellabeachclub.services;
 
-import org.ecommerce.caramellabeachclub.entities.Recensione;
-import org.ecommerce.caramellabeachclub.entities.Prodotto;
-import org.ecommerce.caramellabeachclub.entities.Utente;
-import org.ecommerce.caramellabeachclub.repositories.RecensioneRepository;
-import org.ecommerce.caramellabeachclub.repositories.ProdottoRepository;
-import org.ecommerce.caramellabeachclub.repositories.UtenteRepository;
+import org.ecommerce.caramellabeachclub.entities.*;
+import org.ecommerce.caramellabeachclub.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RecensioneService {
 
-    private final RecensioneRepository recensioneRepository;
-    private final ProdottoRepository prodottoRepository;
-    private final UtenteRepository utenteRepository;
+    @Autowired
+    private RecensioneRepository recensioneRepository;
 
-    public RecensioneService(RecensioneRepository recensioneRepository, ProdottoRepository prodottoRepository, UtenteRepository utenteRepository) {
-        this.recensioneRepository = recensioneRepository;
-        this.prodottoRepository = prodottoRepository;
-        this.utenteRepository = utenteRepository;
-    }
+    @Autowired
+    private UtenteRepository utenteRepository;
 
-    // Salva una recensione
-    public Recensione saveRecensione(Integer prodottoId, Integer utenteId, String valutazione, String commento) {
-        Optional<Prodotto> prodotto = prodottoRepository.findById(prodottoId);
-        Optional<Utente> utente = utenteRepository.findById(utenteId);
+    @Autowired
+    private OrdineRepository ordineRepository;
 
-        if (prodotto.isPresent() && utente.isPresent()) {
-            Recensione recensione = new Recensione();
-            recensione.setIdProdotto(prodotto.get());
-            recensione.setUtente(utente.get());
-            recensione.setValutazione(valutazione);
-            recensione.setCommento(commento);
-            recensione.setData(Instant.now());
-            return recensioneRepository.save(recensione);
-        } else {
-            throw new IllegalArgumentException("Prodotto o utente non trovati");
+    @Autowired
+    private ProdottiOrdinatiRepository prodottiOrdinatiRepository;
+
+    public void aggiungiRecensione(int utente, int ordine, int prodotto, String commento, String valutazione) {
+        Utente user = utenteRepository.findById(utente)
+                .orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
+
+        Ordine ord = ordineRepository.findById(ordine)
+                .orElseThrow(() -> new IllegalArgumentException("Ordine non trovato"));
+
+        if (ord.getIdUtente() != user.getId()) {
+            throw new IllegalArgumentException("Utente non associato all'ordine");
         }
-    }
 
-    // Recupera tutte le recensioni per un prodotto
-    public List<Recensione> getRecensioniByProdotto(Integer prodottoId) {
-        Optional<Prodotto> prodotto = prodottoRepository.findById(prodottoId);
-        if (prodotto.isPresent()) {
-            return recensioneRepository.findByIdProdotto(prodotto.get());
-        } else {
-            throw new IllegalArgumentException("Prodotto non trovato");
+        if (!(ord.getStato().equals("Completato"))) {
+            throw new IllegalArgumentException("Non puoi ancora recensire questo oggetto");
         }
-    }
 
-    // Recupera tutte le recensioni di un utente
-    public List<Recensione> getRecensioniByUtente(Integer utenteId) {
-        Optional<Utente> utente = utenteRepository.findById(utenteId);
-        if (utente.isPresent()) {
-            return recensioneRepository.findByUtente(utente.get());
-        } else {
-            throw new IllegalArgumentException("Utente non trovato");
+        ProdottiOrdinati pO = prodottiOrdinatiRepository.findProdottiOrdinatiByIdProdotto(prodotto);
+        if (pO == null) {
+            throw new IllegalArgumentException("Non puoi ancora recensire questo oggetto");
         }
+
+        Recensione recensione = new Recensione();
+        recensione.setIdProdotto(prodotto);
+        recensione.setIdUtente(user.getId());
+        recensione.setData(Instant.now());
+        recensione.setValutazione(valutazione);
+        recensione.setCommento(commento);
+        recensioneRepository.save(recensione);
+        System.out.println("Recensione aggiunta con successo");
+
     }
 
+    public void eliminaRecensione(int idRecensione, int utenteId) {
+
+        Recensione recensione = recensioneRepository.findById(idRecensione)
+                .orElseThrow(() -> new IllegalArgumentException("Recensione non trovata"));
+
+        // Controllo se l'utente è autorizzato (deve essere lo stesso utente che ha scritto la recensione)
+        if (recensione.getIdUtente() != utenteId) {
+            throw new IllegalArgumentException("Non sei autorizzato a eliminare questa recensione");
+        }
+
+        recensioneRepository.delete(recensione);
+        System.out.println("Recensione eliminata con successo");
+    }
 }

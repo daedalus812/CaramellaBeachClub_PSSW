@@ -11,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/ordini")
 public class OrdineController {
@@ -26,50 +24,15 @@ public class OrdineController {
     @Autowired
     private UtenteRepository utenteRepository;
 
-    // GET - Recuperare tutti gli ordini
-    @GetMapping
-    public ResponseEntity<List<Ordine>> getAllOrdini() {
-        List<Ordine> ordini = ordineRepository.findAll();
-        return new ResponseEntity<>(ordini, HttpStatus.OK);
-    }
 
-    // GET - Recuperare un ordine specifico per ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Ordine> getOrdineById(@PathVariable Integer id) {
-        return ordineRepository.findById(id)
-                .map(ordine -> new ResponseEntity<>(ordine, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+    /*
 
-    // POST - Creare un nuovo ordine
-    @PostMapping
-    public ResponseEntity<Ordine> createOrdine(@RequestBody Ordine ordine) {
-        Ordine nuovoOrdine = ordineRepository.save(ordine);
-        return new ResponseEntity<>(nuovoOrdine, HttpStatus.CREATED);
-    }
+    Il metodo che effettua un ordine si trova all'interno della logica del Carrello, quindi
+    CarrelloService e CarrelloController.
 
-    // PUT - Aggiornare un ordine esistente
-    @PutMapping("/{id}")
-    public ResponseEntity<Ordine> updateOrdine(@PathVariable Integer id, @RequestBody Ordine ordine) {
-        return ordineRepository.findById(id).map(ordineEsistente -> {
-            ordineEsistente.setStato(ordine.getStato());
-            ordineEsistente.setData(ordine.getData());
-            ordineEsistente.setOra(ordine.getOra());
-            ordineRepository.save(ordineEsistente);
-            return new ResponseEntity<>(ordineEsistente, HttpStatus.OK);
-        }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+     */
 
-    // DELETE - Cancellare un ordine
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrdine(@PathVariable Integer id) {
-        return ordineRepository.findById(id).map(ordine -> {
-            ordineRepository.delete(ordine);
-            return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-        }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
-    // POST - Annullare un ordine
+    // Annulla un ordine
     @PostMapping("/{id}/annulla")
     public ResponseEntity<String> annullaOrdine(
             @PathVariable Integer id,
@@ -92,7 +55,7 @@ public class OrdineController {
         }
     }
 
-    // POST - Effettuare un reso per un ordine
+    // Effettua un reso per un ordine
     @PostMapping("/{id}/reso")
     public ResponseEntity<String> effettuaReso(
             @PathVariable Integer id,
@@ -114,7 +77,7 @@ public class OrdineController {
         }
     }
 
-    // POST - Annullare un reso per un ordine
+    // Annulla un reso per un ordine
     @PostMapping("/{id}/reso/annulla")
     public ResponseEntity<String> annullaReso(
             @PathVariable Integer id,
@@ -123,9 +86,10 @@ public class OrdineController {
 
         Utente utente = utenteRepository.findById(idUtente).orElse(null);
         Ordine ordine = ordineRepository.findById(id).orElse(null);
-        Reso reso = ordine.getResos(); // Otteniamo il reso associato all'ordine
+        assert ordine != null;
+        Reso reso = ordine.getResos();
 
-        if (utente == null || ordine == null || reso == null) {
+        if (utente == null || reso == null) {
             return new ResponseEntity<>("Utente, Ordine o Reso non trovati.", HttpStatus.NOT_FOUND);
         }
 
@@ -137,5 +101,4 @@ public class OrdineController {
                     HttpStatus.BAD_REQUEST);
         }
     }
-
 }

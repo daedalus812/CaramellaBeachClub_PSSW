@@ -1,7 +1,5 @@
 package org.ecommerce.caramellabeachclub.controller.rest;
 
-import org.ecommerce.caramellabeachclub.entities.CarrelloProdotto;
-import org.ecommerce.caramellabeachclub.entities.MetodoDiPagamento;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidQuantityException;
 import org.ecommerce.caramellabeachclub.resources.exceptions.ProductNotFoundException;
@@ -18,9 +16,7 @@ public class CarrelloController {
     @Autowired
     private CarrelloService carrelloService;
 
-
-
-    // Aggiungi un prodotto al carrello
+    // Aggiungi al carrello
     @PostMapping("/aggiungi")
     public ResponseEntity<String> aggiungiAlCarrello(
             @RequestParam int idUtente,
@@ -36,13 +32,13 @@ public class CarrelloController {
         } catch (InvalidQuantityException e) {
             return ResponseEntity.status(400).body(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace(); // Stampa l'errore completo nei log
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Errore interno del server.");
         }
     }
 
 
-    // Aumenta la quantità di un prodotto nel carrello
+    // Plus 1 adding
     @PutMapping("/plus")
     public ResponseEntity<String> plusAdding(
             @RequestParam int idUtente,
@@ -74,7 +70,7 @@ public class CarrelloController {
         }
     }
 
-    // Diminuisci la quantità di un prodotto nel carrello
+    // Minus 1 removing
     @PutMapping("/minus")
     public ResponseEntity<String> minusRemoving(
             @RequestParam int idUtente,

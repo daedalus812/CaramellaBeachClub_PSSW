@@ -14,8 +14,6 @@ import lombok.Setter;
 @IdClass(CarrelloProdottoId.class)
 public class CarrelloProdotto {
 
-    // Non utilizzo la @EmbeddedID, voglio evitare il Warning
-
     @Id
     @Column(name = "carrello_id")
     private Integer carrelloId;

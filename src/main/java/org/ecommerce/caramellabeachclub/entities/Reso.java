@@ -25,5 +25,4 @@ public class Reso {
 
     @Column(name = "stato_reso", nullable = false, length = 50)
     private String statoReso;
-
 }

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MetodoDiPagamentoRepository extends JpaRepository<MetodoDiPagamento, Integer> {
 
-    // Puoi aggiungere metodi personalizzati qui, se necessario.
-    // Ad esempio, se vuoi cercare metodi di pagamento per selezione:
-
     MetodoDiPagamento findById(int id);
+
 }

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -27,5 +26,4 @@ public class Categoria {
 
     @OneToMany(mappedBy = "categoria")
     private Set<Prodotto> prodottos = new LinkedHashSet<>();
-
 }

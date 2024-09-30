@@ -3,7 +3,6 @@ package org.ecommerce.caramellabeachclub.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -31,5 +30,4 @@ public class MetodoDiPagamento {
     mi consente di gestire più transazioni associate a un metodo di pagamento.
 
     */
-
 }

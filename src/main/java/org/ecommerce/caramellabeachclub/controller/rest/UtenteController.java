@@ -14,12 +14,6 @@ public class UtenteController {
     @Autowired
     private UtenteService utenteService;
 
-    @GetMapping
-    public ResponseEntity<String> getAllUtenti() {
-        // Logica per restituire tutti gli utenti
-        return new ResponseEntity<>("Lista utenti", HttpStatus.OK);
-    }
-
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
         try {
@@ -34,5 +28,4 @@ public class UtenteController {
             return new ResponseEntity<>("Errore durante il login.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

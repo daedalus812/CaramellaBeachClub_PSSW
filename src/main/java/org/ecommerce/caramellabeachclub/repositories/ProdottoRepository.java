@@ -12,5 +12,4 @@ public interface ProdottoRepository extends JpaRepository<Prodotto,Integer> {
     @Query("SELECT p.disp FROM Prodotto p WHERE p.id = :id")
     Integer findDisponibilitaById(@Param("id") Integer id);
 
-
 }

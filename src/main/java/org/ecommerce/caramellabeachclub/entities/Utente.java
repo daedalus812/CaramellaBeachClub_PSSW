@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -34,11 +33,10 @@ public class Utente {
     @Column(name = "telefono", length = 50)
     private String telefono;
 
-
-    @OneToMany(mappedBy = "utente")
+    @OneToMany(mappedBy = "idUtente")
     private Set<Ordine> ordines = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "utente")
+    @OneToMany(mappedBy = "idUtente")
     private Set<Recensione> recensiones = new LinkedHashSet<>();
 
 }

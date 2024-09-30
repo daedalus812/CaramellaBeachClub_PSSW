@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.Instant;
 
 @Data
@@ -20,8 +19,11 @@ public class Spedizione {
     @Column(name = "id_spedizione", nullable = false)
     private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_ordine", nullable = false)
+    @Column(name = "id_ordine", nullable = false)
+    private int idOrdine;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_ordine", insertable = false, updatable = false)
     private Ordine ordine;
 
     @Column(name = "indirizzo_spedizione", nullable = false, length = 50)

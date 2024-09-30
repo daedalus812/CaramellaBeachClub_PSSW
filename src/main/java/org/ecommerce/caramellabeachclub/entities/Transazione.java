@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -20,8 +19,11 @@ public class Transazione {
     @Column(name = "id_transazione", nullable = false)
     private Integer id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_ordine", nullable = false)
+    @Column(name = "id_ordine", nullable = false)
+    private int idOrdine;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_ordine", insertable = false, updatable = false)
     private Ordine ordine;
 
     @Column(name = "data", nullable = false)
@@ -40,7 +42,4 @@ public class Transazione {
     @Column(name = "esito", nullable = false)
     private boolean esito;
 
-    public void setIdOrdine(Ordine ordine) {
-        this.ordine = ordine;
-    }
 }

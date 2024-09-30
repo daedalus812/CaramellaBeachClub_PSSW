@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.Instant;
 
 @Data
@@ -18,13 +17,11 @@ public class Recensione {
     @Column(name = "id_recensione", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_prodotto", nullable = false)
-    private Prodotto idProdotto;
+    private int idProdotto;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_utente", nullable = false)
-    private Utente utente;
+    private int idUtente;
 
     @Column(name = "valutazione", nullable = false, length = 50)
     private String valutazione;
@@ -34,6 +31,4 @@ public class Recensione {
 
     @Column(name = "data", nullable = false)
     private Instant data;
-
-
 }

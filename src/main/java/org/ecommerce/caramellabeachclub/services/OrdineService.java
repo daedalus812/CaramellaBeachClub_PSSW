@@ -1,10 +1,6 @@
-//CHECK DONE, OK!
 package org.ecommerce.caramellabeachclub.services;
 
-import org.ecommerce.caramellabeachclub.entities.Ordine;
-import org.ecommerce.caramellabeachclub.entities.Reso;
-import org.ecommerce.caramellabeachclub.entities.Transazione;
-import org.ecommerce.caramellabeachclub.entities.Utente;
+import org.ecommerce.caramellabeachclub.entities.*;
 import org.ecommerce.caramellabeachclub.repositories.*;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
 import org.ecommerce.caramellabeachclub.resources.exceptions.UserNotFoundException;
@@ -32,9 +28,12 @@ public class OrdineService {
         Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
         Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(InvalidOperationException::new);
 
-        if (!ordine.getUtente().equals(utente)) {
+        if (!(ordine.getIdUtente() ==(utente.getId()))) {
             throw new InvalidOperationException();
         }
+
+        Spedizione sped = ordine.getSpedizione();
+        sped.setStato("Ordine annullato!");
 
         ordine.setStato("Annullato. Motivo: " + motivo);
         ordineRepository.save(ordine);
@@ -47,14 +46,14 @@ public class OrdineService {
         // infatti quando si effettua un annullamento di un ordine, appare la dicitura:
         // "Se è l'importo è stato già prelevato, riceverete il rimborso entro 1-2 giorni"
         // Ragion per cui, su Amazon, c'è la possibilità che un ordine venga annullato senza che
-        // l'importo sia stato effettivamente pagato
+        // l'importo sia stato effettivamente pagato.
 
         processaRimborso(ordine);
     }
 
-    private boolean processaRimborso(Ordine ordine) {
+    private void processaRimborso(Ordine ordine) {
         BigDecimal importoRimborso = calcolaImportoRimborso(ordine);
-        return simulaRimborso(importoRimborso);
+        simulaRimborso(importoRimborso);
     }
 
     private BigDecimal calcolaImportoRimborso(Ordine ordine) {
@@ -62,7 +61,7 @@ public class OrdineService {
         return transazione.getImporto();
     }
 
-    private boolean simulaRimborso(BigDecimal importo) {
+    private void simulaRimborso(BigDecimal importo) {
         // Logica di esempio per simulare un rimborso
         System.out.println("Rimborso in corso. Importo: " + importo);
 
@@ -71,10 +70,8 @@ public class OrdineService {
 
         if (rimborsoSuccesso) {
             System.out.println("Rimborso completato con successo!");
-            return true;
         } else {
             System.out.println("Rimborso fallito.");
-            return false;
         }
     }
 
@@ -84,25 +81,22 @@ public class OrdineService {
         Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
         Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(InvalidOperationException::new);
 
-        if (!ordine.getUtente().equals(utente)) {
+        if (!(ordine.getIdUtente() ==(utente.getId()))) {
             throw new InvalidOperationException("Operazione non valida: l'utente non è associato a questo ordine");
         }
 
-        // Verifica se l'ordine è già stato reso
+        // Verifico se l'ordine è già stato reso
         if (ordine.getStato().equals("Reso Completato, rimborso effettuato.")) {
             throw new InvalidOperationException("Questo ordine è già stato reso");
         }
 
-        // Creazione dell'oggetto Reso
         Reso reso = new Reso();
         reso.setIdOrdine(ordine);
         reso.setMotivo(motivo);
         reso.setStatoReso("In attesa di elaborazione");
 
-        // Salvataggio del reso nel repository
         resoRepository.save(reso);
 
-        // Aggiornamento dello stato dell'ordine
         ordine.setStato("Reso");
         ordineRepository.save(ordine);
 
@@ -113,18 +107,18 @@ public class OrdineService {
         Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
         Ordine ordine = ordineRepository.findById(o.getId()).orElseThrow(InvalidOperationException::new);
 
-        if (!ordine.getUtente().equals(utente)) {
+        if (!(ordine.getIdUtente() ==(utente.getId()))) {
             throw new InvalidOperationException("Operazione non valida: l'utente non è associato a questo ordine");
         }
 
         Reso reso = resoRepository.findById(r.getId()).orElseThrow(InvalidOperationException::new);
 
-        // Verifica se l'ordine è già stato reso
         if (ordine.getStato().equals("Reso Completato, rimborso effettuato.")) {
             throw new InvalidOperationException("Questo ordine è già stato reso");
         }
 
         reso.setStatoReso("Annullato");
+        ordine.setStato("Completato");
         resoRepository.save(reso);
     }
 }
