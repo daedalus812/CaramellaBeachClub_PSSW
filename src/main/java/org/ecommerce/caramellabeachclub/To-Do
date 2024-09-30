@@ -1,2 +1,3 @@
 To-Do List
-- Gestione del token jwt scaduto in JWTAuthenticationFilter.java
+- Fare il login con l'implementazione di spring security
+- Front end
