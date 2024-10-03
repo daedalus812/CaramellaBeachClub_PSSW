@@ -4,7 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -12,31 +17,62 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "utente")
-public class Utente {
+public class Utente implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_utente", nullable = false)
     private Integer id;
 
-    @Column(name = "nome", nullable = false, length = 50)
+    @Column(name = "nome")
     private String nome;
 
-    @Column(name = "cognome", nullable = false, length = 50)
+    @Column(name = "cognome")
     private String cognome;
 
+    @Getter
+    @Setter
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Column(name = "telefono", length = 50)
+    @Column(name = "telefono")
     private String telefono;
 
-    @OneToMany(mappedBy = "idUtente")
+    @OneToMany(mappedBy = "idUtente", fetch = FetchType.EAGER)
     private Set<Ordine> ordines = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "idUtente")
+    @OneToMany(mappedBy = "idUtente", fetch = FetchType.EAGER)
     private Set<Recensione> recensiones = new LinkedHashSet<>();
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

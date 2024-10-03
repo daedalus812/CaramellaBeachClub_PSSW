@@ -1,5 +1,7 @@
 package org.ecommerce.caramellabeachclub.controller.rest;
 
+import jakarta.validation.constraints.*;
+import org.ecommerce.caramellabeachclub.entities.Utente;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidQuantityException;
 import org.ecommerce.caramellabeachclub.resources.exceptions.ProductNotFoundException;
@@ -7,6 +9,8 @@ import org.ecommerce.caramellabeachclub.resources.exceptions.UserNotFoundExcepti
 import org.ecommerce.caramellabeachclub.services.CarrelloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +23,13 @@ public class CarrelloController {
     // Aggiungi al carrello
     @PostMapping("/aggiungi")
     public ResponseEntity<String> aggiungiAlCarrello(
-            @RequestParam int idUtente,
-            @RequestParam int idProdotto,
-            @RequestParam int quantita) {
+            @RequestParam @NotNull @Positive int idProdotto,
+            @RequestParam @NotNull @Positive int quantita) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Utente currentUser = (Utente) authentication.getPrincipal();
+        int idUtente = currentUser.getId();
+
         try {
             carrelloService.aggiungiAlCarrello(idUtente, idProdotto, quantita);
             return ResponseEntity.ok("Prodotto aggiunto al carrello con successo.");
@@ -41,8 +49,10 @@ public class CarrelloController {
     // Plus 1 adding
     @PutMapping("/plus")
     public ResponseEntity<String> plusAdding(
-            @RequestParam int idUtente,
-            @RequestParam int idProdotto) {
+            @RequestParam @NotNull @Positive int idProdotto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Utente currentUser = (Utente) authentication.getPrincipal();
+        int idUtente = currentUser.getId();
         try {
             carrelloService.plusAdding(idUtente, idProdotto);
             return ResponseEntity.ok("Quantità aumentata con successo.");
@@ -58,8 +68,10 @@ public class CarrelloController {
     // Rimuovi un prodotto dal carrello
     @DeleteMapping("/rimuovi")
     public ResponseEntity<String> rimuoviDalCarrello(
-            @RequestParam int idUtente,
-            @RequestParam int idProdotto) {
+            @RequestParam @NotNull @Positive int idProdotto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Utente currentUser = (Utente) authentication.getPrincipal();
+        int idUtente = currentUser.getId();
         try {
             carrelloService.rimuoviDalCarrello(idUtente, idProdotto);
             return ResponseEntity.ok("Prodotto rimosso dal carrello con successo.");
@@ -73,8 +85,10 @@ public class CarrelloController {
     // Minus 1 removing
     @PutMapping("/minus")
     public ResponseEntity<String> minusRemoving(
-            @RequestParam int idUtente,
-            @RequestParam int idProdotto) {
+            @RequestParam @NotNull @Positive int idProdotto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Utente currentUser = (Utente) authentication.getPrincipal();
+        int idUtente = currentUser.getId();
         try {
             carrelloService.minusRemoving(idUtente, idProdotto);
             return ResponseEntity.ok("Quantità ridotta con successo.");
@@ -87,7 +101,10 @@ public class CarrelloController {
 
     // Svuota il carrello
     @DeleteMapping("/svuota")
-    public ResponseEntity<String> svuotaCarrello(@RequestParam int idUtente) {
+    public ResponseEntity<String> svuotaCarrello() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Utente currentUser = (Utente) authentication.getPrincipal();
+        int idUtente = currentUser.getId();
         try {
             carrelloService.svuotaCarrello(idUtente);
             return ResponseEntity.ok("Carrello svuotato con successo.");
@@ -99,9 +116,11 @@ public class CarrelloController {
     // Effettua un ordine
     @PostMapping("/ordina")
     public ResponseEntity<String> ordina(
-            @RequestParam int idUtente,
-            @RequestParam int metodoPagamento,
-            @RequestParam String indirizzoSpedizione) {
+            @RequestParam @NotNull @Min(1) int metodoPagamento,
+            @RequestParam @NotNull String indirizzoSpedizione) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Utente currentUser = (Utente) authentication.getPrincipal();
+        int idUtente = currentUser.getId();
         try {
             carrelloService.ordina(idUtente, metodoPagamento, indirizzoSpedizione);
             return ResponseEntity.ok("Ordine effettuato con successo.");
