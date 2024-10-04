@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,6 +47,16 @@ public class Utente implements UserDetails {
     @OneToMany(mappedBy = "idUtente", fetch = FetchType.EAGER)
     private Set<Recensione> recensiones = new LinkedHashSet<>();
 
+
+    @Getter
+    private boolean enabled;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
+
+    @Column(name = "verification_expiration")
+    private LocalDateTime verificationCodeExpireAt;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -71,8 +82,5 @@ public class Utente implements UserDetails {
         return true;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+
 }
