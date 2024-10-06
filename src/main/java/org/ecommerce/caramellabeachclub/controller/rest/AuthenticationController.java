@@ -8,9 +8,13 @@ import org.ecommerce.caramellabeachclub.responses.LoginResponse;
 import org.ecommerce.caramellabeachclub.services.AuthenticationService;
 import org.ecommerce.caramellabeachclub.services.JwtService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
+//@CrossOrigin(origins = "http://localhost:63342")
 @RequestMapping("/auth")
 @RestController
 public class AuthenticationController {
@@ -23,11 +27,24 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
+    @GetMapping("/signup")
+    public ModelAndView signup() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("register_page");
+        return modelAndView;
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<Utente> register(@RequestBody RegisterUserDto registerUserDto) {
         Utente registeredUser = authenticationService.signup(registerUserDto);
-
         return ResponseEntity.ok(registeredUser);
+    }
+
+    @GetMapping("/login")
+    public ModelAndView login() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("login_page");
+        return modelAndView;
     }
 
     @PostMapping("/login")
@@ -41,7 +58,18 @@ public class AuthenticationController {
         loginResponse.setExpiresIn(jwtService.getExpirationTime());
 
         return ResponseEntity.ok(loginResponse);
+
     }
+
+
+    @GetMapping("/verify")
+    public ModelAndView verify() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("verify_page");
+        return modelAndView;
+    }
+
+
     @PostMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestBody VerifyUserDto verifyUserDto){
         try{
@@ -50,6 +78,14 @@ public class AuthenticationController {
         } catch (RuntimeException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+
+    @GetMapping("/resend")
+    public ModelAndView resend() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("verify_page");
+        return modelAndView;
     }
 
     @PostMapping("/resend")

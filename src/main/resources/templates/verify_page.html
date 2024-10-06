@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifica Account</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .message {
+      margin-top: 15px;
+      color: red;
+    }
+
+    p {
+      margin-top: 20px;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Verifica il tuo Account</h1>
+  <p>La mail di verifica è stata inviata a: <span id="emailDisplay"></span></p>
+  <form id="verifyForm">
+    <div class="form-group">
+      <label for="verificationCode">Inserisci il codice di verifica:</label>
+      <input type="text" id="verificationCode" name="verificationCode" required>
+    </div>
+    <button type="submit">Verifica</button>
+    <div class="message" id="message"></div>
+  </form>
+  <p>Non hai ricevuto il codice? <a href="#" id="resendCode">Rinvia Codice</a></p>
+</div>
+
+<script>
+  // Recupera l'email dal localStorage e visualizzala
+  const email = localStorage.getItem('email');
+  document.getElementById('emailDisplay').textContent = email;
+
+  // Verifica codice
+  document.getElementById('verifyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const verificationCode = document.getElementById('verificationCode').value;
+
+    fetch('/auth/verify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, verificationCode })  // Invia il codice di verifica insieme all'email
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Codice di verifica errato!');
+              }
+              return response.text();
+            })
+            .then(data => {
+              window.location.href = '/auth/login';
+            })
+            .catch(error => {
+              document.getElementById('message').textContent = error.message;
+              document.getElementById('message').classList.add('error');
+            });
+  });
+
+  // Rinvia il codice di verifica
+  document.getElementById('resendCode').addEventListener('click', function(e) {
+    e.preventDefault();
+
+    fetch('/auth/resend', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })  // Invia l'email per il rinvio del codice
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Errore durante l\'invio del codice di verifica!');
+              }
+              return response.text();
+            })
+            .then(data => {
+              alert('Codice di verifica inviato nuovamente!');
+            })
+            .catch(error => {
+              alert(error.message);
+            });
+  });
+</script>
+</body>
+</html>

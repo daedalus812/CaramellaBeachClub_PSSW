@@ -47,6 +47,8 @@ public class Utente implements UserDetails {
     @OneToMany(mappedBy = "idUtente", fetch = FetchType.EAGER)
     private Set<Recensione> recensiones = new LinkedHashSet<>();
 
+    @Column(name = "role")
+    private String role;
 
     @Getter
     private boolean enabled;
@@ -59,8 +61,9 @@ public class Utente implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(() -> "ROLE_" + role); // Aggiunge il prefisso "ROLE_" al ruolo
     }
+
 
     @Override
     public String getUsername() {

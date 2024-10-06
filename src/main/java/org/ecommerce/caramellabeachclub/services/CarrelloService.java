@@ -205,7 +205,7 @@ public class CarrelloService {
     }
 
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+   /* @Transactional(isolation = Isolation.SERIALIZABLE)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public void ordina(int idUtente, int metodoDiPagamento, String indirizzoSpedizione)
             throws UserNotFoundException, InvalidOperationException {
@@ -214,6 +214,8 @@ public class CarrelloService {
 
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
         Set<CarrelloProdotto> prodottiUser = carrelloProdottoRepository.findByCarrelloId(carrello.getIdCarrello());
+
+
 
         if (prodottiUser.isEmpty()) {
             System.out.println("Carrello contenuto: " + carrello.getCarrelloProdottos());
@@ -278,7 +280,101 @@ public class CarrelloService {
         transazioneRepository.save(transazione);
         spedizioneRepository.save(spedizione);
         ordineRepository.save(ordine);
+    }*/
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public void ordina(int idUtente, int metodoDiPagamento, String indirizzoSpedizione)
+            throws UserNotFoundException, InvalidOperationException {
+
+        Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
+
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
+        Set<CarrelloProdotto> prodottiUser = carrelloProdottoRepository.findByCarrelloId(carrello.getIdCarrello());
+
+        if (prodottiUser.isEmpty()) {
+            System.out.println("Carrello contenuto: " + carrello.getCarrelloProdottos());
+            throw new InvalidOperationException("Il carrello è vuoto. Aggiungi prodotti prima di procedere all'ordine.");
+        }
+
+        // Verifico la disponibilità dei prodotti prima di procedere all'ordine
+        for (CarrelloProdotto cp : prodottiUser) {
+            Prodotto prodotto = prodottoRepository.findById(cp.getProdottoId())
+                    .orElseThrow(() -> new InvalidOperationException("Prodotto non trovato"));
+
+            // Verifico se la quantità disponibile è sufficiente
+            if (prodotto.getDisp() < cp.getQuantita()) {
+                throw new InvalidOperationException("La quantità del prodotto '" + prodotto.getNome() + "' non è sufficiente per completare l'ordine.");
+            }
+
+            // Decremento temporaneamente la quantità disponibile
+            prodotto.setDisp(prodotto.getDisp() - cp.getQuantita());
+            prodottoRepository.save(prodotto);
+        }
+
+        // Creo di un nuovo ordine e una nuova transazione
+        Ordine ordine = new Ordine();
+        Transazione transazione = new Transazione();
+
+        MetodoDiPagamento met = metodoDiPagamentoRepository.findById(metodoDiPagamento);
+
+        ordine.setIdCarrello(carrello.getIdCarrello()); // Preso dal db e corrispondente all'utente che ha cliccato
+        ordine.setIdUtente(user.getId());
+        ordine.setOra(LocalTime.now());
+        ordine.setData(LocalDateTime.now());
+        ordine.setStato("Processamento in corso...");
+        ordineRepository.save(ordine);
+
+        transazione.setMetodoDiPagamento(met);
+        transazione.setIdOrdine(ordine.getId());
+        transazione.setOra(LocalTime.now());
+        transazione.setData(Instant.now());
+        transazione.setImporto(calcolaImporto(prodottiUser));
+
+        Spedizione spedizione = new Spedizione();
+        spedizione.setIdOrdine(ordine.getId());
+        spedizione.setIndirizzoSpedizione(indirizzoSpedizione);
+        spedizione.setDataPrevista(Instant.now().plus(7, ChronoUnit.DAYS)); // Simulazione spedizione dopo 7 giorni
+        spedizione.setStato("In corso...");
+
+        boolean esitoPagamento = processaPagamento(met, transazione.getImporto());
+
+        if (esitoPagamento) {
+            transazione.setEsito(true);
+            ordine.setStato("Pagamento completato");
+            svuotaCarrello(idUtente);
+
+            // Salvo i prodotti ordinati
+            for (CarrelloProdotto cp : prodottiUser) {
+                ProdottiOrdinati po = new ProdottiOrdinati();
+                po.setIdProdotto(cp.getProdottoId());
+                po.setIdUtente(user.getId());
+                po.setIdOrdine(ordine.getId());
+                prodottiOrdinatiRepository.save(po);
+            }
+
+        } else {
+            transazione.setEsito(false);
+            ordine.setStato("Pagamento fallito");
+
+            // Ripristino la quantità dei prodotti poiché il pagamento è fallito
+            for (CarrelloProdotto cp : prodottiUser) {
+                Prodotto prodotto = prodottoRepository.findById(cp.getProdottoId())
+                        .orElseThrow(() -> new InvalidOperationException("Prodotto non trovato"));
+
+                prodotto.setDisp(prodotto.getDisp() + cp.getQuantita());
+                prodottoRepository.save(prodotto);
+            }
+
+            throw new InvalidOperationException("Il pagamento è fallito. Riprovare.");
+        }
+
+        // Salvo le transazioni e la spedizione
+        transazioneRepository.save(transazione);
+        spedizioneRepository.save(spedizione);
+        ordineRepository.save(ordine);
     }
+
 
     private static BigDecimal calcolaImporto(Set<CarrelloProdotto> prodottiUser) {
         BigDecimal totale = BigDecimal.ZERO;

@@ -24,22 +24,29 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     private final EmailService emailService;
+    private final UtenteRepository utenteRepository;
 
     public AuthenticationService(
             UtenteRepository userRepository,
             AuthenticationManager authenticationManager,
             PasswordEncoder passwordEncoder,
-            EmailService emailService
-    ) {
+            EmailService emailService,
+            UtenteRepository utenteRepository) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.utenteRepository = utenteRepository;
     }
 
     public Utente signup(RegisterUserDto input) {
         Utente user = new Utente();
         user.setEmail(input.getEmail());
+
+        if (userRepository.findByEmail(input.getEmail()).isPresent()){
+            throw new RuntimeException("Email già registrata!");
+        }
+
         user.setPassword(passwordEncoder.encode(input.getPassword()));
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpireAt(LocalDateTime.now().plusMinutes(5));
