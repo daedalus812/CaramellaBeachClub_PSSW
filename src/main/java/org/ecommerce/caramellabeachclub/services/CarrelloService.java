@@ -297,7 +297,7 @@ public class CarrelloService {
             throw new InvalidOperationException("Il carrello è vuoto. Aggiungi prodotti prima di procedere all'ordine.");
         }
 
-        // Verifico la disponibilità dei prodotti prima di procedere all'ordine
+        // Verifico la disponibilità dei prodotti prima di procedere
         for (CarrelloProdotto cp : prodottiUser) {
             Prodotto prodotto = prodottoRepository.findById(cp.getProdottoId())
                     .orElseThrow(() -> new InvalidOperationException("Prodotto non trovato"));
