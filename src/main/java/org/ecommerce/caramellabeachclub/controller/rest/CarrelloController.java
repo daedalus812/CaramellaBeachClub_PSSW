@@ -11,6 +11,7 @@ import org.ecommerce.caramellabeachclub.resources.exceptions.UserNotFoundExcepti
 import org.ecommerce.caramellabeachclub.services.CarrelloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class CarrelloController {
     @Autowired
     private UtenteRepository utenteRepository;
 
+    @PreAuthorize("hasAuthority('ROLE_fullstack-developer')")
     @PostMapping("/aggiungi")
     public ResponseEntity<String> aggiungiAlCarrello(
             @RequestParam @NotNull @Positive int idProdotto,

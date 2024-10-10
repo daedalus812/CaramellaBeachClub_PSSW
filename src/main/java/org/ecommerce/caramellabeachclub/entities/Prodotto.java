@@ -30,6 +30,7 @@ public class Prodotto {
     @Column(name = "descrizione", length = 50)
     private String descrizione;
 
+    @Column(name = "immagine_url", length = 200)
     private String immagineUrl;
 
     @Column(name = "prezzo", nullable = false, precision = 10, scale = 2)
