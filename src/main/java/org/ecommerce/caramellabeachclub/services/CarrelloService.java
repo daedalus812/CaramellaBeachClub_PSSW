@@ -47,14 +47,17 @@ public class CarrelloService {
     private ProdottiOrdinatiRepository prodottiOrdinatiRepository;
 
     @Transactional
-    public void aggiungiAlCarrello(int idUtente, int idProdotto, int quantita)
+    public void aggiungiAlCarrello(String idUtente, int idProdotto, int quantita)
             throws UserNotFoundException, ProductNotFoundException, InvalidQuantityException {
 
         // Recupera l'utente dal database.
         // Il carrello a cui aggiungere il prodotto te lo trovi tramite l'utente
         // poichè ad ogni utente è associato un solo carrello
 
-        Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
+        Utente user = utenteRepository.findByEmail(idUtente);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
 
         // Recupera il carrello dell'utente o creane uno nuovo se non esiste
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());

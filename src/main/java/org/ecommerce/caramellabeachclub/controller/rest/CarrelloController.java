@@ -2,6 +2,8 @@ package org.ecommerce.caramellabeachclub.controller.rest;
 
 import jakarta.validation.constraints.*;
 import org.ecommerce.caramellabeachclub.entities.Utente;
+import org.ecommerce.caramellabeachclub.jwt.CustomJwt;
+import org.ecommerce.caramellabeachclub.repositories.UtenteRepository;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidQuantityException;
 import org.ecommerce.caramellabeachclub.resources.exceptions.ProductNotFoundException;
@@ -20,18 +22,19 @@ public class CarrelloController {
     @Autowired
     private CarrelloService carrelloService;
 
-    // Aggiungi al carrello
+    @Autowired
+    private UtenteRepository utenteRepository;
+
     @PostMapping("/aggiungi")
     public ResponseEntity<String> aggiungiAlCarrello(
             @RequestParam @NotNull @Positive int idProdotto,
             @RequestParam @NotNull @Positive int quantita) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Utente currentUser = (Utente) authentication.getPrincipal();
-        int idUtente = currentUser.getId();
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        String email = jwt.getName();
 
         try {
-            carrelloService.aggiungiAlCarrello(idUtente, idProdotto, quantita);
+            carrelloService.aggiungiAlCarrello(email, idProdotto, quantita);
             return ResponseEntity.ok("Prodotto aggiunto al carrello con successo.");
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(404).body("Utente non trovato.");

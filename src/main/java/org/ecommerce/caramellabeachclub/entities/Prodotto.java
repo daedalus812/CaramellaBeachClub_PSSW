@@ -21,14 +21,16 @@ public class Prodotto {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_categoria", nullable = false)
+    @JoinColumn(name = "id_categoria")
     private Categoria categoria;
 
-    @Column(name = "nome", nullable = false, length = 50)
+    @Column(name = "nome", length = 50)
     private String nome;
 
     @Column(name = "descrizione", length = 50)
     private String descrizione;
+
+    private String immagineUrl;
 
     @Column(name = "prezzo", nullable = false, precision = 10, scale = 2)
     // precision= 10, scale= 2  | per rappresentare correttamente i valori monetari, es. 49.99€

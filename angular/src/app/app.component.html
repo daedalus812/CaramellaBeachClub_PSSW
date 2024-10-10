@@ -1,14 +1,23 @@
-<div>
-  <h2>Fullstack OAuth2 Keycloak</h2>
-</div>
-<div>
-  <div>
-    <button (click)="getHelloText()">GET HELLO TEXT</button>
-  </div>
-  <div>
-    <button (click)="logout()">LOGOUT</button>
-  </div>
-</div>
-<div>
-  {{ helloText }}
-</div>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caramella Beach Club</title>
+    <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="http://localhost:4200" class="logo">Caramella Beach Club | Official Store</a>
+        <ul class="nav-links">
+            <li><span id="welcome-message" class="welcome-message">{{ benvenutoText }}</span></li>
+            <li><a href="#ordini">I Miei Ordini</a></li>
+            <li><a href="#profilo">Il Mio Profilo</a></li>
+            <li><a routerLink="/carrello" routerLinkActive="active">Carrello</a></li>
+            <li><button class="logout-button" (click)="logout()">LOGOUT</button></li> 
+        </ul>
+    </nav>
+</body>
+</html>
+
+<router-outlet></router-outlet>
