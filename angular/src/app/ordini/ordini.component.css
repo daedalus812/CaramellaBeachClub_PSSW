@@ -1,0 +1,115 @@
+/* ordini.component.css */
+
+.ordini-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .page-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2em;
+    color: #333;
+  }
+  
+  .ordine-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 15px;
+  }
+  
+  .ordine-header {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+  }
+  
+  .ordine-header h3 {
+    margin: 0;
+    color: #2c3e50;
+  }
+  
+  .ordine-header p {
+    margin: 5px 0;
+    color: #555;
+  }
+  
+  .ordine-stato {
+    font-weight: bold;
+    color: #e74c3c; /* Rosso per gli stati critici, puoi cambiare colore in base allo stato */
+  }
+  
+  .prodotti-ordinati {
+    margin-top: 15px;
+  }
+  
+  .prodotti-ordinati h4 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+  }
+  
+  .prodotto-ordinato {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+  }
+  
+  .prodotto-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .prodotto-immagine {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 15px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+  
+  .prodotto-dettagli h5 {
+    margin: 0 0 5px 0;
+    color: #333;
+  }
+  
+  .prodotto-dettagli p {
+    margin: 2px 0;
+    color: #555;
+  }
+  
+  .ordine-footer {
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    text-align: right;
+  }
+  
+  .ordine-totale {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  .no-ordini, .loading, .error {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  .no-ordini p, .loading p, .error p {
+    font-size: 1.2em;
+    color: #555;
+  }
+  .ordine-stato.completato {
+    color: green;
+  }
+  
+  .ordine-stato.annullato {
+    color: red;
+  }
+  

@@ -11,7 +11,7 @@
         <a href="http://localhost:4200" class="logo">Caramella Beach Club | Official Store</a>
         <ul class="nav-links">
             <li><span id="welcome-message" class="welcome-message">{{ benvenutoText }}</span></li>
-            <li><a href="#ordini">I Miei Ordini</a></li>
+            <li><a routerLink="/ordini" routerLinkActive="active">I Miei Ordini</a></li>
             <li><a href="#profilo">Il Mio Profilo</a></li>
             <li><a routerLink="/carrello" routerLinkActive="active">Carrello</a></li>
             <li><button class="logout-button" (click)="logout()">LOGOUT</button></li> 

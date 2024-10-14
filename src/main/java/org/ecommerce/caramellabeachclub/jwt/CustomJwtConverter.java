@@ -14,10 +14,10 @@ public class CustomJwtConverter implements Converter<Jwt, CustomJwt> {
 
     @Override
     public CustomJwt convert(@NonNull Jwt jwt) {
-        // Extract claims and authorities as needed
+
         Collection<GrantedAuthority> authorities = extractAuthorities(jwt);
 
-        // You can also map other information from the Jwt to the custom token
+
         var customJwt = new CustomJwt(jwt, authorities);
         customJwt.setFirstname(jwt.getClaimAsString("given_name"));
         customJwt.setLastname(jwt.getClaimAsString("family_name"));
@@ -27,7 +27,7 @@ public class CustomJwtConverter implements Converter<Jwt, CustomJwt> {
     private Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
         var authorities = new ArrayList<GrantedAuthority>();
 
-        // ... your logic to extract and map the claims to GrantedAuthority ...
+
         var realm_access = jwt.getClaimAsMap("realm_access");
         if (realm_access != null && realm_access.get("roles") != null) {
             var roles = realm_access.get("roles");

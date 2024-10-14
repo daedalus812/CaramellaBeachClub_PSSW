@@ -19,7 +19,7 @@ export class AppComponent implements OnInit{
   constructor(private oauthService: OAuthService, private httpClient: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
-    // Ascolta quando il token viene ricevuto correttamente dopo il login
+    
     this.oauthService.events
       .pipe(filter(e => e.type === 'token_received'))
       .subscribe(() => {
@@ -28,7 +28,7 @@ export class AppComponent implements OnInit{
         this.benvenuto();
       });
 
-    // In caso il token sia già presente (reindirizzamento senza evento token_received)
+    
     if (this.oauthService.hasValidAccessToken()) {
       console.log('Token già presente, facendo partire la chiamata...');
       this.benvenuto();

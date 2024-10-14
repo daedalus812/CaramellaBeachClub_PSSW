@@ -1,28 +1,62 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable } from 'rxjs';
+
+export interface CarrelloProdottoDTO {
+  idProdotto: number;
+  nomeProdotto: string;
+  prezzo: number;
+  imageUrl: string;
+  quantita: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CarrelloService {
 
-  private baseUrl = 'http://localhost:8080/carrello'; // Assicurati che l'URL sia corretto
+  private baseUrl = 'http://localhost:8080/carrello';
 
   constructor(private httpClient: HttpClient, private oauthService: OAuthService) { }
 
-  aggiungiAlCarrello(idProdotto: number, quantita: number): Observable<any> {
+  private getHeaders(): HttpHeaders {
     const token = this.oauthService.getAccessToken();
-    const headers = new HttpHeaders({
+    return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
+  }
 
-    // Poiché il backend si aspetta parametri tramite @RequestParam, li inviamo come query params
-    const params = new HttpParams()
-      .set('idProdotto', idProdotto.toString())
-      .set('quantita', quantita.toString());
+  getCartItems(): Observable<CarrelloProdottoDTO[]> {
+    return this.httpClient.get<CarrelloProdottoDTO[]>(`${this.baseUrl}/items`, { headers: this.getHeaders() });
+  }
 
-    return this.httpClient.post(`${this.baseUrl}/aggiungi`, null, { headers, params, responseType: 'text' });
+  aggiungiAlCarrello(idProdotto: number, quantita: number): Observable<any> {
+    const params = { idProdotto: idProdotto.toString(), quantita: quantita.toString() };
+    return this.httpClient.post(`${this.baseUrl}/aggiungi`, null, { headers: this.getHeaders(), params });
+  }
+
+  plusAdding(idProdotto: number): Observable<any> {
+    const params = { idProdotto: idProdotto.toString() };
+    return this.httpClient.put(`${this.baseUrl}/plus`, null, { headers: this.getHeaders(), params });
+  }
+
+  minusRemoving(idProdotto: number): Observable<any> {
+    const params = { idProdotto: idProdotto.toString() };
+    return this.httpClient.put(`${this.baseUrl}/minus`, null, { headers: this.getHeaders(), params });
+  }
+
+  rimuoviDalCarrello(idProdotto: number): Observable<any> {
+    const params = { idProdotto: idProdotto.toString() };
+    return this.httpClient.delete(`${this.baseUrl}/rimuovi`, { headers: this.getHeaders(), params });
+  }
+
+  svuotaCarrello(): Observable<any> {
+    return this.httpClient.delete(`${this.baseUrl}/svuota`, { headers: this.getHeaders() });
+  }
+
+  ordina(metodoPagamento: number, indirizzoSpedizione: string): Observable<any> {
+    const params = { metodoPagamento: metodoPagamento.toString(), indirizzoSpedizione };
+    return this.httpClient.post(`${this.baseUrl}/ordina`, null, { headers: this.getHeaders(), params });
   }
 }

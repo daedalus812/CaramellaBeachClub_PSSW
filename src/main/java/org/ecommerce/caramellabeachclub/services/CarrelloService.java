@@ -1,6 +1,7 @@
 package org.ecommerce.caramellabeachclub.services;
 
 import jakarta.persistence.LockModeType;
+import org.ecommerce.caramellabeachclub.dto.CarrelloProdottoDTO;
 import org.ecommerce.caramellabeachclub.entities.ProdottiOrdinati;
 import org.ecommerce.caramellabeachclub.entities.*;
 import org.ecommerce.caramellabeachclub.repositories.*;
@@ -16,6 +17,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -116,12 +119,16 @@ public class CarrelloService {
     }
 
     @Transactional
-    public void plusAdding(int idUtente, int idProdotto)
+    public void plusAdding(String email, int idProdotto)
             throws UserNotFoundException, ProductNotFoundException, InvalidQuantityException {
 
-        if (utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new) == null) {
+
+        Utente user = utenteRepository.findByEmail(email);
+        if (user == null) {
             throw new UserNotFoundException();
         }
+
+        int idUtente = user.getId();
 
         CarrelloProdotto cp = carrelloProdottoRepository.findByCarrelloAndProdottoId
                 (carrelloRepository.findByIdUtente(idUtente), idProdotto);
@@ -145,11 +152,14 @@ public class CarrelloService {
     }
 
     @Transactional
-    public void rimuoviDalCarrello(int idUtente, int prodottoID)
+    public void rimuoviDalCarrello(String email, int prodottoID)
             throws UserNotFoundException, InvalidOperationException {
 
-        // Recupero l'utente dal database
-        Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
+        Utente user = utenteRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+
 
         // Recupero il carrello dell'utente
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
@@ -172,10 +182,15 @@ public class CarrelloService {
 
 
     @Transactional
-    public void minusRemoving(int idUtente, int idProdotto)
+    public void minusRemoving(String email, int idProdotto)
             throws UserNotFoundException, InvalidOperationException {
 
-        Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
+        Utente user = utenteRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        int idUtente = user.getId();
+
 
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
 
@@ -197,8 +212,11 @@ public class CarrelloService {
     }
 
     @Transactional
-    public void svuotaCarrello(int idUtente) throws UserNotFoundException {
-        Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
+    public void svuotaCarrello(String email) throws UserNotFoundException {
+        Utente user = utenteRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
 
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
 
@@ -208,89 +226,17 @@ public class CarrelloService {
     }
 
 
-   /* @Transactional(isolation = Isolation.SERIALIZABLE)
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public void ordina(int idUtente, int metodoDiPagamento, String indirizzoSpedizione)
+    //@Transactional(isolation = Isolation.SERIALIZABLE)
+    //@Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Transactional
+    public void ordina(String email, int metodoDiPagamento, String indirizzoSpedizione)
             throws UserNotFoundException, InvalidOperationException {
 
-        Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
-
-        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
-        Set<CarrelloProdotto> prodottiUser = carrelloProdottoRepository.findByCarrelloId(carrello.getIdCarrello());
-
-
-
-        if (prodottiUser.isEmpty()) {
-            System.out.println("Carrello contenuto: " + carrello.getCarrelloProdottos());
-            throw new InvalidOperationException("Il carrello è vuoto. Aggiungi prodotti prima di procedere all'ordine.");
+        Utente user = utenteRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException();
         }
-
-        // Creazione di un nuovo ordine e una nuova transazione
-        Ordine ordine = new Ordine();
-
-        Transazione transazione = new Transazione();
-
-        MetodoDiPagamento met = metodoDiPagamentoRepository.findById(metodoDiPagamento);
-
-        ordine.setIdCarrello(carrello.getIdCarrello()); // Preso dal db e corrispondente all'utente che ha cliccato
-        ordine.setIdUtente(user.getId());;
-
-        ordine.setOra(LocalTime.now());
-        ordine.setData(LocalDateTime.now());
-        ordine.setStato("Processamento in corso...");
-        ordineRepository.save(ordine);
-
-        transazione.setMetodoDiPagamento(met);
-        transazione.setIdOrdine(ordine.getId());
-        transazione.setOra(LocalTime.now());
-        transazione.setData(Instant.now());
-        transazione.setImporto(calcolaImporto(prodottiUser));
-
-        Spedizione spedizione = new Spedizione();
-        spedizione.setIdOrdine(ordine.getId());
-        spedizione.setIndirizzoSpedizione(indirizzoSpedizione);
-
-        // Assumo che la spedizione avvenga fra 7 giorni (simulazione)
-        spedizione.setDataPrevista(Instant.now().plus(7, ChronoUnit.DAYS));
-        spedizione.setStato("In corso...");
-
-        boolean esitoPagamento = processaPagamento(met, transazione.getImporto());
-
-        if (esitoPagamento) {
-            transazione.setEsito(true);
-            ordine.setStato("Pagamento completato");
-            svuotaCarrello(idUtente);
-
-        } else {
-            transazione.setEsito(false);
-            ordine.setStato("Pagamento fallito");
-            throw new InvalidOperationException();
-        }
-
-        // Faccio sto discorso perché poi, quando dovrò aggiungere una recensione,
-        // la aggiungerò su un prodotto che è stato ordinato, sennò dove me lo piglio l'id del prodotto
-        // che è stato ordinato? L'ordine mica lo contiene? Il carrello viene svuotato in seguito ad un ordine
-        // andado a buon fine... quindi ma fazzu nto panaru se non faccio la roba seguente
-
-        for (CarrelloProdotto cp : prodottiUser){
-            ProdottiOrdinati po = new ProdottiOrdinati();
-            po.setIdProdotto(cp.getProdottoId());
-            po.setIdUtente(user.getId());
-            po.setIdOrdine(ordine.getId());
-            prodottiOrdinatiRepository.save(po);
-        }
-
-        transazioneRepository.save(transazione);
-        spedizioneRepository.save(spedizione);
-        ordineRepository.save(ordine);
-    }*/
-
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public void ordina(int idUtente, int metodoDiPagamento, String indirizzoSpedizione)
-            throws UserNotFoundException, InvalidOperationException {
-
-        Utente user = utenteRepository.findById(idUtente).orElseThrow(UserNotFoundException::new);
+        int idUtente = user.getId();
 
         Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
         Set<CarrelloProdotto> prodottiUser = carrelloProdottoRepository.findByCarrelloId(carrello.getIdCarrello());
@@ -320,6 +266,9 @@ public class CarrelloService {
         Transazione transazione = new Transazione();
 
         MetodoDiPagamento met = metodoDiPagamentoRepository.findById(metodoDiPagamento);
+        if (met==null){
+            throw new InvalidOperationException("Metodo di pagamento non trovato");
+        }
 
         ordine.setIdCarrello(carrello.getIdCarrello()); // Preso dal db e corrispondente all'utente che ha cliccato
         ordine.setIdUtente(user.getId());
@@ -345,7 +294,7 @@ public class CarrelloService {
         if (esitoPagamento) {
             transazione.setEsito(true);
             ordine.setStato("Pagamento completato");
-            svuotaCarrello(idUtente);
+            svuotaCarrello(email);
 
             // Salvo i prodotti ordinati
             for (CarrelloProdotto cp : prodottiUser) {
@@ -353,6 +302,7 @@ public class CarrelloService {
                 po.setIdProdotto(cp.getProdottoId());
                 po.setIdUtente(user.getId());
                 po.setIdOrdine(ordine.getId());
+                po.setQuantita(cp.getQuantita());
                 prodottiOrdinatiRepository.save(po);
             }
 
@@ -447,5 +397,39 @@ public class CarrelloService {
             return false;
         }
     }
+
+    @Transactional
+    public List<CarrelloProdottoDTO> getCartItemsByEmail(String email) throws UserNotFoundException {
+
+        Utente user = utenteRepository.findByEmail(email);
+        if (user==null){
+            throw new UserNotFoundException();
+        }
+
+        Carrello carrello = carrelloRepository.findByIdUtente(user.getId());
+        Set<CarrelloProdotto> prodottiUser = carrelloProdottoRepository.findByCarrelloId(carrello.getIdCarrello());
+
+        System.out.println("Carrello contenuto: " + carrello.getCarrelloProdottos());
+        System.out.println("Numero di prodotti nel carrello: " + carrello.getCarrelloProdottos().size());
+
+        List<CarrelloProdottoDTO> cartItems = new ArrayList<>();
+
+        for (CarrelloProdotto cp : prodottiUser) {
+            System.out.println("Prodotto nel carrello: " + cp.getProdottoId());
+            Prodotto prodotto = cp.getProdotto();
+
+            CarrelloProdottoDTO dto = new CarrelloProdottoDTO();
+            dto.setIdProdotto(prodotto.getId());
+            dto.setNomeProdotto(prodotto.getNome());
+            dto.setPrezzo(prodotto.getPrezzo());
+            dto.setImageUrl(prodotto.getImmagineUrl());
+            dto.setQuantita(cp.getQuantita());
+
+            cartItems.add(dto);
+        }
+
+        return cartItems;
+    }
+
 
 }

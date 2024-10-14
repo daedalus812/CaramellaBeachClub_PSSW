@@ -1,13 +1,18 @@
 package org.ecommerce.caramellabeachclub.services;
 
+import org.ecommerce.caramellabeachclub.dto.OrdineDTO;
+import org.ecommerce.caramellabeachclub.dto.ProdottoOrdinatoDTO;
 import org.ecommerce.caramellabeachclub.entities.*;
 import org.ecommerce.caramellabeachclub.repositories.*;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
+import org.ecommerce.caramellabeachclub.resources.exceptions.ProductNotFoundException;
 import org.ecommerce.caramellabeachclub.resources.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -23,6 +28,12 @@ public class OrdineService {
 
     @Autowired
     private UtenteRepository utenteRepository;
+
+    @Autowired
+    private ProdottiOrdinatiRepository prodottiOrdinatiRepository;
+
+    @Autowired
+    private ProdottoRepository prodottoRepository;
 
     public void annullaOrdine(Utente u, Ordine o, String motivo) {
         Utente utente = utenteRepository.findById(u.getId()).orElseThrow(UserNotFoundException::new);
@@ -121,4 +132,49 @@ public class OrdineService {
         ordine.setStato("Completato");
         resoRepository.save(reso);
     }
+
+    public List<OrdineDTO> getOrdiniByEmail(String email) throws UserNotFoundException {
+        Utente user = utenteRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+
+        // Recupera gli ordini dell'utente
+        List<Ordine> ordini = ordineRepository.findByIdUtente(user.getId());
+
+        List<OrdineDTO> ordiniDTO = new ArrayList<>();
+        for (Ordine ordine : ordini) {
+            OrdineDTO dto = new OrdineDTO();
+            dto.setIdOrdine(ordine.getId());
+            dto.setData(ordine.getData());
+            dto.setOra(ordine.getOra());
+            dto.setStato(ordine.getStato());
+
+
+            // Recupera i prodotti ordinati per questo ordine
+            List<ProdottiOrdinati> prodottiOrdinati = prodottiOrdinatiRepository.findProdottiOrdinatiByIdOrdine(ordine.getId());
+
+            List<ProdottoOrdinatoDTO> prodottiDTO = new ArrayList<>();
+            for (ProdottiOrdinati po : prodottiOrdinati) {
+                // Recupera il prodotto utilizzando idProdotto
+                Prodotto prodotto = prodottoRepository.findById(po.getIdProdotto())
+                        .orElseThrow(ProductNotFoundException::new);
+
+                ProdottoOrdinatoDTO prodottoDTO = new ProdottoOrdinatoDTO();
+                prodottoDTO.setIdProdotto(prodotto.getId());
+                prodottoDTO.setNome(prodotto.getNome());
+                prodottoDTO.setImmagineUrl(prodotto.getImmagineUrl());
+                prodottoDTO.setPrezzo(prodotto.getPrezzo());
+                prodottoDTO.setQuantita(po.getQuantita()); // Assicurati che ProdottiOrdinati abbia il campo quantita
+
+                prodottiDTO.add(prodottoDTO);
+            }
+            dto.setProdotti(prodottiDTO);
+
+            ordiniDTO.add(dto);
+        }
+
+        return ordiniDTO;
+    }
+
 }

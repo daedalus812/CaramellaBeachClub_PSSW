@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -22,5 +24,8 @@ public class ProdottiOrdinati {
 
     @Column(name = "id_utente", nullable = false)
     private Integer idUtente;
+
+    @Column(name = "quantita", nullable = false)
+    private Integer quantita;
 
 }

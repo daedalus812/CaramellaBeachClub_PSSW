@@ -21,6 +21,7 @@ public class Carrello {
     @JoinColumn(name = "id_utente", nullable = false)
     private int idUtente;
 
-    @OneToMany(mappedBy = "carrello", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //metto EAGER per test
+    @OneToMany(mappedBy = "carrello", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<CarrelloProdotto> carrelloProdottos = new LinkedHashSet<>();
 }

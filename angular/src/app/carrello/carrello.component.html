@@ -1,5 +1,39 @@
-<h1>Il tuo carrello</h1>
-<div class="cart-items">
-    <!-- Qui puoi mostrare i prodotti nel carrello -->
-    <p>Non ci sono articoli nel carrello.</p>
+<div class="cart-container" *ngIf="!isLoading && cartItems.length > 0">
+  <h2>Il tuo carrello</h2>
+  <div class="cart-items">
+    <div class="cart-item" *ngFor="let item of cartItems">
+      <img [src]="item.imageUrl" [alt]="item.nomeProdotto">
+      <div class="item-details">
+        <h3>{{ item.nomeProdotto }}</h3>
+        <p>Prezzo unitario: €{{ item.prezzo }}</p>
+        <div class="quantity-controls">
+          <button (click)="decreaseQuantity(item.idProdotto)">-</button>
+          <span>{{ item.quantita }}</span>
+          <button (click)="increaseQuantity(item.idProdotto)">+</button>
+        </div>
+        <p>Totale: €{{ item.prezzo * item.quantita | number:'1.2-2' }}</p>
+        <button class="remove-button" (click)="removeItem(item.idProdotto)">Rimuovi</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cart-summary">
+    <p>Importo totale: €{{ totalAmount | number:'1.2-2' }}</p>
+    <button class="empty-cart-button" (click)="emptyCart()">Svuota Carrello</button>
+  </div>
+
+  <div class="order-form">
+    <h3>Effettua l'ordine</h3>
+    <label for="indirizzo">Indirizzo di Spedizione:</label>
+    <input type="text" id="indirizzo" [(ngModel)]="indirizzoSpedizione" placeholder="Inserisci indirizzo">
+    
+    <label for="metodoPagamento">Metodo di Pagamento:</label>
+    <select id="metodoPagamento" [(ngModel)]="metodoPagamento">
+      <option value="1">Carta di Credito</option>
+      <option value="2">PayPal</option>
+      <!-- Aggiungi altre opzioni se necessario -->
+    </select>
+    
+    <button class="order-button" (click)="placeOrder()">Effettua Ordine</button>
+  </div>
 </div>

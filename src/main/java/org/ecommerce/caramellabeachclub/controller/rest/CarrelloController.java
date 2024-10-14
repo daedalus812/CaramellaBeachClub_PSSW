@@ -1,7 +1,7 @@
 package org.ecommerce.caramellabeachclub.controller.rest;
 
 import jakarta.validation.constraints.*;
-import org.ecommerce.caramellabeachclub.entities.Utente;
+import org.ecommerce.caramellabeachclub.dto.CarrelloProdottoDTO;
 import org.ecommerce.caramellabeachclub.jwt.CustomJwt;
 import org.ecommerce.caramellabeachclub.repositories.UtenteRepository;
 import org.ecommerce.caramellabeachclub.resources.exceptions.InvalidOperationException;
@@ -12,9 +12,10 @@ import org.ecommerce.caramellabeachclub.services.CarrelloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 @RestController
 @RequestMapping("/carrello")
@@ -26,9 +27,9 @@ public class CarrelloController {
     @Autowired
     private UtenteRepository utenteRepository;
 
-    @PreAuthorize("hasAuthority('ROLE_fullstack-developer')")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/aggiungi")
-    public ResponseEntity<String> aggiungiAlCarrello(
+    public ResponseEntity<Map<String, String>> aggiungiAlCarrello(
             @RequestParam @NotNull @Positive int idProdotto,
             @RequestParam @NotNull @Positive int quantita) {
 
@@ -37,102 +38,156 @@ public class CarrelloController {
 
         try {
             carrelloService.aggiungiAlCarrello(email, idProdotto, quantita);
-            return ResponseEntity.ok("Prodotto aggiunto al carrello con successo.");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Prodotto aggiunto al carrello con successo.");
+            return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body("Utente non trovato.");
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Utente non trovato.");
+            return ResponseEntity.status(404).body(response);
         } catch (ProductNotFoundException e) {
-            return ResponseEntity.status(404).body("Prodotto non trovato.");
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Prodotto non trovato.");
+            return ResponseEntity.status(404).body(response);
         } catch (InvalidQuantityException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(400).body(response);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Errore interno del server.");
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Errore interno del server.");
+            return ResponseEntity.status(500).body(response);
         }
     }
 
+    @GetMapping("/items")
+    public ResponseEntity<List<CarrelloProdottoDTO>> getCartItems() {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        String email = jwt.getName();
 
-    // Plus 1 adding
-    @PutMapping("/plus")
-    public ResponseEntity<String> plusAdding(
-            @RequestParam @NotNull @Positive int idProdotto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Utente currentUser = (Utente) authentication.getPrincipal();
-        int idUtente = currentUser.getId();
         try {
-            carrelloService.plusAdding(idUtente, idProdotto);
-            return ResponseEntity.ok("Quantità aumentata con successo.");
+            List<CarrelloProdottoDTO> cartItems = carrelloService.getCartItemsByEmail(email);
+            return ResponseEntity.ok(cartItems);
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body("Utente non trovato.");
+            return ResponseEntity.status(404).body(Collections.emptyList());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Collections.emptyList());
+        }
+    }
+
+    // Aumenta la quantità di un prodotto nel carrello
+    @PutMapping("/plus")
+    public ResponseEntity<Map<String, String>> plusAdding(
+            @RequestParam @NotNull @Positive int idProdotto) {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        String email = jwt.getName();
+        try {
+            carrelloService.plusAdding(email, idProdotto);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Quantità aumentata con successo.");
+            return ResponseEntity.ok(response);
+        } catch (UserNotFoundException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Utente non trovato.");
+            return ResponseEntity.status(404).body(response);
         } catch (ProductNotFoundException e) {
-            return ResponseEntity.status(404).body("Prodotto non trovato.");
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Prodotto non trovato.");
+            return ResponseEntity.status(404).body(response);
         } catch (InvalidQuantityException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(400).body(response);
         }
     }
 
     // Rimuovi un prodotto dal carrello
     @DeleteMapping("/rimuovi")
-    public ResponseEntity<String> rimuoviDalCarrello(
+    public ResponseEntity<Map<String, String>> rimuoviDalCarrello(
             @RequestParam @NotNull @Positive int idProdotto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Utente currentUser = (Utente) authentication.getPrincipal();
-        int idUtente = currentUser.getId();
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        String email = jwt.getName();
+
         try {
-            carrelloService.rimuoviDalCarrello(idUtente, idProdotto);
-            return ResponseEntity.ok("Prodotto rimosso dal carrello con successo.");
+            carrelloService.rimuoviDalCarrello(email, idProdotto);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Prodotto rimosso dal carrello con successo.");
+            return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body("Utente non trovato.");
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Utente non trovato.");
+            return ResponseEntity.status(404).body(response);
         } catch (InvalidOperationException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(400).body(response);
         }
     }
 
-    // Minus 1 removing
+    // Diminuisce la quantità di un prodotto nel carrello
     @PutMapping("/minus")
-    public ResponseEntity<String> minusRemoving(
+    public ResponseEntity<Map<String, String>> minusRemoving(
             @RequestParam @NotNull @Positive int idProdotto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Utente currentUser = (Utente) authentication.getPrincipal();
-        int idUtente = currentUser.getId();
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        String email = jwt.getName();
+
         try {
-            carrelloService.minusRemoving(idUtente, idProdotto);
-            return ResponseEntity.ok("Quantità ridotta con successo.");
+            carrelloService.minusRemoving(email, idProdotto);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Quantità ridotta con successo.");
+            return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body("Utente non trovato.");
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Utente non trovato.");
+            return ResponseEntity.status(404).body(response);
         } catch (InvalidOperationException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(400).body(response);
         }
     }
 
     // Svuota il carrello
     @DeleteMapping("/svuota")
-    public ResponseEntity<String> svuotaCarrello() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Utente currentUser = (Utente) authentication.getPrincipal();
-        int idUtente = currentUser.getId();
+    public ResponseEntity<Map<String, String>> svuotaCarrello() {
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        String email = jwt.getName();
+
         try {
-            carrelloService.svuotaCarrello(idUtente);
-            return ResponseEntity.ok("Carrello svuotato con successo.");
+            carrelloService.svuotaCarrello(email);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Carrello svuotato con successo.");
+            return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body("Utente non trovato.");
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Utente non trovato.");
+            return ResponseEntity.status(404).body(response);
         }
     }
 
     // Effettua un ordine
     @PostMapping("/ordina")
-    public ResponseEntity<String> ordina(
+    public ResponseEntity<Map<String, String>> ordina(
             @RequestParam @NotNull @Min(1) int metodoPagamento,
             @RequestParam @NotNull String indirizzoSpedizione) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Utente currentUser = (Utente) authentication.getPrincipal();
-        int idUtente = currentUser.getId();
+        var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
+        String email = jwt.getName();
+
         try {
-            carrelloService.ordina(idUtente, metodoPagamento, indirizzoSpedizione);
-            return ResponseEntity.ok("Ordine effettuato con successo.");
+            carrelloService.ordina(email, metodoPagamento, indirizzoSpedizione);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Ordine effettuato con successo.");
+            return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body("Utente non trovato.");
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Utente non trovato.");
+            return ResponseEntity.status(404).body(response);
         } catch (InvalidOperationException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(400).body(response);
         }
     }
 }

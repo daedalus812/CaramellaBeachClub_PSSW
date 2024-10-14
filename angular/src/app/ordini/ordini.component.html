@@ -1,0 +1,39 @@
+<div class="ordini-container" *ngIf="!isLoading && ordini.length > 0">
+  <h2 class="page-title">I Miei Ordini</h2>
+  <div class="ordine-card" *ngFor="let ordine of ordini">
+    <div class="ordine-header">
+      <h3>Ordine #{{ ordine.idOrdine }}</h3>
+      <p>Data e Ora: {{ ordine.data | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p>Stato: <span class="ordine-stato">{{ ordine.stato }}</span></p>
+      <div class="ordine-azioni">
+        <button (click)="confermaAnnullamentoOrdine(ordine)">Annulla Ordine</button>
+        <button (click)="confermaResoOrdine(ordine)">Richiedi Reso</button>
+      </div>
+    </div>
+    <div class="prodotti-ordinati">
+      <h4>Prodotti Ordinati:</h4>
+      <div class="prodotto-ordinato" *ngFor="let prodotto of ordine.prodotti">
+        <div class="prodotto-info">
+          <img [src]="prodotto.immagineUrl" alt="{{ prodotto.nome }}" class="prodotto-immagine">
+          <div class="prodotto-dettagli">
+            <h5>{{ prodotto.nome }}</h5>
+            <p>Quantità: {{ prodotto.quantita }}</p>
+            <p>Prezzo: {{ prodotto.prezzo | currency:'EUR' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ordine-footer">
+      <p class="ordine-totale">Totale Ordine: {{ calcolaTotaleOrdine(ordine.prodotti) | currency:'EUR' }}</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="!isLoading && ordini.length === 0" class="no-ordini">
+  <p>Non hai ordini al momento.</p>
+</div>
+<div *ngIf="isLoading" class="loading">
+  <p>Caricamento in corso...</p>
+</div>
+<div *ngIf="errorMessage" class="error">
+  <p>{{ errorMessage }}</p>
+</div>

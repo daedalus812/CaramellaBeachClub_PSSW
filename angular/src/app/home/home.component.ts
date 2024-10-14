@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Product } from '../../product/product';
+import { ProdottoService, Prodotto } from '../services/prodotto.service';
 import { CarrelloService } from '../services/carrello.service';
 import { CommonModule } from '@angular/common';
+import { OAuthService } from 'angular-oauth2-oidc';
 
 @Component({
   selector: 'app-home',
@@ -12,38 +13,39 @@ import { CommonModule } from '@angular/common';
 })
 export class HomeComponent implements OnInit {
 
-  products: Product[] = [];
+  products: Prodotto[] = [];
   quantities: number[] = [];
+  isLoading: boolean = true;
+  errorMessage: string = '';
 
-  constructor(private carrelloService: CarrelloService) { }
+  constructor(private prodottoService: ProdottoService, private carrelloService: CarrelloService, private oauthService: OAuthService) { }
 
   ngOnInit(): void {
-    this.products = [
-      {
-        id: 9,
-        name: 'Felpa',
-        price: 49.99,
-        availability: true,
-        imageUrl: 'https://i.ibb.co/QYKqbsF/felpa.jpg'
-      },
-      {
-        id: 7,
-        name: 'T-Shirt',
-        price: 29.99,
-        availability: true,
-        imageUrl: 'https://i.ibb.co/vYmTvh3/image.png'
-      },
-      {
-        id: 10,
-        name: 'Tazza',
-        price: 14.99,
-        availability: true,
-        imageUrl: 'https://i.ibb.co/jDqyFBY/image.png'
-      }
-    ];
+    if (this.oauthService.hasValidAccessToken()) {
+      this.loadProducts();
+    } else {
+      // Iscriviti agli eventi per sapere quando l'autenticazione è completata
+      this.oauthService.events.subscribe(event => {
+        if (event.type === 'token_received') {
+          this.loadProducts();
+        }
+      });
+    }
+  }
 
-    // Inizializza le quantità a 1 per ogni prodotto
-    this.quantities = this.products.map(() => 1);
+  loadProducts(): void {
+    this.prodottoService.getProdottiDisponibili().subscribe(
+      prodotti => {
+        this.products = prodotti;
+        this.quantities = this.products.map(() => 1);
+        this.isLoading = false;
+      },
+      error => {
+        console.error('Errore nel caricamento dei prodotti:', error);
+        this.errorMessage = 'Errore nel caricamento dei prodotti.';
+        this.isLoading = false;
+      }
+    );
   }
 
   onQuantityChange(event: any, index: number): void {
@@ -54,13 +56,13 @@ export class HomeComponent implements OnInit {
   addToCart(productId: number, quantity: number): void {
     this.carrelloService.aggiungiAlCarrello(productId, quantity).subscribe(
       response => {
-        console.log(response);
+        console.log('Successo:', response);
         alert('Prodotto aggiunto al carrello con successo.');
       },
       error => {
-        console.error(error);
+        console.error('Errore:', error);
         alert('Errore durante l\'aggiunta al carrello.');
       }
     );
-  }
+}
 }

@@ -12,7 +12,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -30,8 +32,8 @@ public class HomeController {
     private ProdottoRepository prodottoRepository;
 
     @GetMapping("/home")
-    @PreAuthorize("hasAuthority('ROLE_fullstack-developer')")
-    public ResponseEntity<String> home(){
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, String>> home(){
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
         Utente loggato = utenteRepository.findByEmail(jwt.getName());
         String email = jwt.getName();
@@ -42,7 +44,9 @@ public class HomeController {
             save.setCognome(jwt.getLastname());
             utenteRepository.save(save);
         }
-        return ResponseEntity.ok("Utente loggato correttamente e presente nel database");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Utente loggato correttamente e presente nel database");
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/prodotti")

@@ -20,10 +20,6 @@ public class Prodotto {
     @Column(name = "id_prodotto", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_categoria")
-    private Categoria categoria;
-
     @Column(name = "nome", length = 50)
     private String nome;
 
@@ -45,4 +41,7 @@ public class Prodotto {
 
     @Column(name = "disp")
     private Integer disp;
+
+    @Column(name = "disponibilita_true")
+    private Boolean disponibilita;
 }
