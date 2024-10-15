@@ -1,36 +1,58 @@
-### Caramella Beach Club 🏖️
+# 🌴 Caramella Beach Club | Official Store 🛍️
 
-Welcome to Caramella Beach Club! This repository hosts the source code for a web-based e-commerce platform developed as a project for the "Software Platforms and Web Development" course at the University of Calabria.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Angular](https://img.shields.io/badge/angular-14.0.0-red.svg)
+![Spring Boot](https://img.shields.io/badge/spring%20boot-2.5.4-brightgreen.svg)
+![Keycloak](https://img.shields.io/badge/keycloak-15.0.2-orange.svg)
+![Java](https://img.shields.io/badge/java-11-red.svg)
+![TypeScript](https://img.shields.io/badge/typescript-4.3.5-blue.svg)
 
-#### Project Description 🚀
+Welcome to the **Caramella Beach Club | Official Store**
 
-Caramella Beach Club is an online marketplace specializing in the sale of products and services for our beach establishment. Our platform offers a curated selection of items and services for beachgoers, including sunbeds, umbrellas, and relaxation packages.
+## 🏖️ About Caramella Beach Club
 
-#### Features 🎉
+Caramella Beach Club is an e-commerce platform dedicated to offering high-quality beachwear, accessories, and lifestyle products. Our mission is to bring the vibrant and carefree spirit of the beach to your doorstep, ensuring you stay stylish and comfortable wherever you go.
 
-- **Explore Beach Services:** Discover our collection of products and services for maximum comfort at the beach.
-- **User Registration:** Create an account to access personalized features and save your favorite items.
-- **Add to Cart:** Easily add items and services to your cart and proceed to checkout securely.
-- **Product Reviews:** Share your experiences by leaving reviews for the products and services you've purchased.
-- **Order Tracking:** Keep track of your orders with real-time updates on shipping and delivery status.
-- **Easy Returns:** Hassle-free return process ensures your satisfaction with every purchase.
+> **Note:** This project was developed as part of an academic examination and serves as a demonstration of e-commerce platform capabilities.
 
-#### Technologies Used 💻
 
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** Java Spring
-- **Database:** PostgreSQL
-- **Version Control:** Git
+## 🌟 Features
 
-#### License 📝
+- **User Authentication & Authorization**: Secure login and role-based access using Keycloak.
+- **Product Management**: Add, view, and manage products effortlessly.
+- **Shopping Cart**: Seamless cart experience for easy purchases.
+- **Order Tracking**: Monitor your orders from checkout to delivery.
+- **Responsive Design**: Optimized for all devices, ensuring a smooth shopping experience on mobile, tablet, and desktop.
+- **Secure Transactions**: Safe and secure payment processing to protect your data.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 🛠️ Technologies Used
 
-#### About Us ℹ️
+### **Frontend**
+- **[Angular](https://angular.io/)**: A powerful framework for building dynamic single-page applications.
+- **[TypeScript](https://www.typescriptlang.org/)**: Adds strong typing to JavaScript for better code quality.
+- **[Bootstrap](https://getbootstrap.com/)**: For responsive and mobile-first front-end development.
 
-Caramella Beach Club is a project developed by me as part of the "Software Platforms and Web Development" course at UNICAL. It aims to provide a relaxing and comfortable experience for all beach lovers.
+### **Backend**
+- **[Spring Boot](https://spring.io/projects/spring-boot)**: A robust framework for building scalable and secure server-side applications.
+- **[Java](https://www.java.com/)**: The primary programming language for backend development.
+- **[Keycloak](https://www.keycloak.org/)**: An open-source Identity and Access Management solution for securing applications.
 
-Enjoy your time at Caramella Beach Club! 🏖️
+### **Database**
+- **[PostgreSQL](https://www.postgresql.org/)**: A powerful, open-source relational database system.
 
-![5f350afd62d93-1597311741](https://github.com/daedalus812/CaramellaBeachClub_PSSW/assets/146168654/e304db39-4776-4bc5-8898-8a0508cb841c)
+### **Other Tools**
+- **[Git](https://git-scm.com/)**: Version control for tracking changes.
+- **[Docker](https://www.docker.com/)**: Containerization for easy deployment and scalability.
+
+## 📸 Screenshots
+
+### **Home Page**
+![image](https://github.com/user-attachments/assets/40a541a9-6523-495a-99e8-f742a76f5211)
+
+### **Add Product**
+![image](https://github.com/user-attachments/assets/fdd82232-ee6f-4246-a9a0-067521052d71)
+
+### **Shopping Cart**
+![image](https://github.com/user-attachments/assets/49fc2c7b-b1fe-4d2f-9af5-dca87b084ef8)
+
 
