@@ -15,7 +15,4 @@ public class CarrelloProdottoDTO {
     private BigDecimal prezzo;
     private String imageUrl;
     private int quantita;
-
-
 }
-

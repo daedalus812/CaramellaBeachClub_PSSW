@@ -31,9 +31,15 @@
     <select id="metodoPagamento" [(ngModel)]="metodoPagamento">
       <option value="1">Carta di Credito</option>
       <option value="2">PayPal</option>
-      <!-- Aggiungi altre opzioni se necessario -->
     </select>
     
     <button class="order-button" (click)="placeOrder()">Effettua Ordine</button>
+  </div>
+</div>
+
+<div class="empty-cart-container" *ngIf="!isLoading && cartItems.length === 0">
+  <div class="empty-cart-message">
+    <h2>Il tuo carrello è vuoto</h2>
+    <p>Aggiungi dei prodotti al tuo carrello per iniziare.</p>
   </div>
 </div>

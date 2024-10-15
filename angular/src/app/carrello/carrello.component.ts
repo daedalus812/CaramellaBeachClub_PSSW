@@ -18,7 +18,7 @@ export class CarrelloComponent implements OnInit {
   totalAmount: number = 0;
 
   // Variabili per l'ordine
-  metodoPagamento: number = 1; // Puoi impostare un valore di default
+  metodoPagamento: number = 1; // Ho messo giusto un valore di default cosi
   indirizzoSpedizione: string = '';
 
   constructor(private carrelloService: CarrelloService) { }

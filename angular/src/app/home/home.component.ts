@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit {
     if (this.oauthService.hasValidAccessToken()) {
       this.loadProducts();
     } else {
-      // Iscriviti agli eventi per sapere quando l'autenticazione è completata
+
       this.oauthService.events.subscribe(event => {
         if (event.type === 'token_received') {
           this.loadProducts();

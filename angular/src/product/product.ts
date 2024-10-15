@@ -5,4 +5,3 @@ export interface Product {
     availability: boolean;
     imageUrl: string;
   }
-  

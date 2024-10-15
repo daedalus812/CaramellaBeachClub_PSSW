@@ -21,4 +21,3 @@ public class OrdineDTO {
     private List<ProdottoOrdinatoDTO> prodotti;
 
 }
-

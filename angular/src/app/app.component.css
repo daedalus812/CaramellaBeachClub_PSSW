@@ -12,6 +12,18 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+.add-product-button {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  
+  .add-product-button:hover {
+    background-color: #218838;
+  }
+
 .logo {
     color: white;
     font-size: 30px; /* Dimensione del font */
@@ -55,7 +67,7 @@ body {
     border-radius: 5px; /* Bordi arrotondati */
     padding: 5px 10px; /* Padding del bottone */
     font-size: 18px; /* Dimensione del font */
-    cursor: pointer; /* Cursor a mano */
+    cursor: pointer;
     transition: background-color 0.3s; /* Transizione */
 }
 

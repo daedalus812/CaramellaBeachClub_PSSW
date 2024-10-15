@@ -2,7 +2,6 @@ package org.ecommerce.caramellabeachclub.controller.rest;
 
 import org.ecommerce.caramellabeachclub.entities.Prodotto;
 import org.ecommerce.caramellabeachclub.repositories.ProdottoRepository;
-import org.ecommerce.caramellabeachclub.services.ProdottoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +19,6 @@ import java.util.List;
 @RequestMapping("/prodotti")
 public class ProdottoController {
 
-    @Autowired
-    private ProdottoService prodottoService;
     @Autowired
     private ProdottoRepository prodottoRepository;
 

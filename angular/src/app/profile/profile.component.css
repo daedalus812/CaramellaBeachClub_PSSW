@@ -1,0 +1,115 @@
+.profile-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Afacad Flux', sans-serif;
+}
+
+.profile-container h1 {
+  text-align: center;
+  color: #333333;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  margin-bottom: 30px;
+}
+
+.user-info p {
+  font-size: 1.1em;
+  color: #555555;
+  margin: 10px 0;
+}
+
+.profile-container h2 {
+  color: #333333;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 5px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555555;
+}
+
+.form-group input {
+  padding: 10px 15px;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  font-size: 1em;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.error {
+  color: #ff4d4d;
+  margin-top: 5px;
+  font-size: 0.9em;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.success-message {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 5px solid #28a745;
+  border-radius: 5px;
+}
+
+.error-message {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 5px solid #dc3545;
+  border-radius: 5px;
+}
+
+/* Responsività */
+@media (max-width: 768px) {
+  .profile-container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  button {
+    font-size: 0.9em;
+    padding: 10px;
+  }
+}

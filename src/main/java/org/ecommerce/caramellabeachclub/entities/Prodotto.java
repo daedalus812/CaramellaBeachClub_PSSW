@@ -36,8 +36,6 @@ public class Prodotto {
     @OneToMany(mappedBy = "prodotto")
     private Set<CarrelloProdotto> carrelloProdottos = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "idProdotto")
-    private Set<Recensione> recensiones = new LinkedHashSet<>();
 
     @Column(name = "disp")
     private Integer disp;

@@ -12,8 +12,9 @@
         <ul class="nav-links">
             <li><span id="welcome-message" class="welcome-message">{{ benvenutoText }}</span></li>
             <li><a routerLink="/ordini" routerLinkActive="active">I Miei Ordini</a></li>
-            <li><a href="#profilo">Il Mio Profilo</a></li>
+            <li><a routerLink="/profile">Il Mio Profilo</a></li>
             <li><a routerLink="/carrello" routerLinkActive="active">Carrello</a></li>
+            <li><a routerLink="/add-product" routerLinkActive="active">Aggiungi Prodotto</a></li>
             <li><button class="logout-button" (click)="logout()">LOGOUT</button></li> 
         </ul>
     </nav>

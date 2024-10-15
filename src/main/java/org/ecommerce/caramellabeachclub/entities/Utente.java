@@ -1,6 +1,7 @@
 package org.ecommerce.caramellabeachclub.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class Utente {
     private String email;
 
     @Column(name = "telefono")
+    @Pattern(regexp = "^(\\+\\d{1,3}( )?)?\\d{10}$", message = "Numero di telefono non valido")
     private String telefono;
 
 }

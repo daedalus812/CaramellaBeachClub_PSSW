@@ -61,6 +61,7 @@ public class CarrelloController {
         }
     }
 
+    // Mi prendo gli items dal carrello
     @GetMapping("/items")
     public ResponseEntity<List<CarrelloProdottoDTO>> getCartItems() {
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();
@@ -77,7 +78,7 @@ public class CarrelloController {
         }
     }
 
-    // Aumenta la quantità di un prodotto nel carrello
+    // Aumento la quantità di un prodotto nel carrello (plus adding)
     @PutMapping("/plus")
     public ResponseEntity<Map<String, String>> plusAdding(
             @RequestParam @NotNull @Positive int idProdotto) {
@@ -103,7 +104,7 @@ public class CarrelloController {
         }
     }
 
-    // Rimuovi un prodotto dal carrello
+    // Rimozione di un prodotto dal carrello
     @DeleteMapping("/rimuovi")
     public ResponseEntity<Map<String, String>> rimuoviDalCarrello(
             @RequestParam @NotNull @Positive int idProdotto) {
@@ -149,7 +150,6 @@ public class CarrelloController {
         }
     }
 
-    // Svuota il carrello
     @DeleteMapping("/svuota")
     public ResponseEntity<Map<String, String>> svuotaCarrello() {
         var jwt = (CustomJwt) SecurityContextHolder.getContext().getAuthentication();

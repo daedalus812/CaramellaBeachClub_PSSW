@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { OAuthService } from 'angular-oauth2-oidc'; // Importa OAuthService
+import { OAuthService } from 'angular-oauth2-oidc';
 
 export interface ProdottoOrdinato {
   idProdotto: number;

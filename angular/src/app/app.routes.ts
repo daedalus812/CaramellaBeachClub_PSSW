@@ -12,5 +12,14 @@ export const routes: Routes = [
     {
         path: "ordini",
         loadComponent: () => import('./ordini/ordini.component').then((c) => c.OrdiniComponent)
-    }
+    },
+    {
+        path: "profile",
+        loadComponent: () => import('./profile/profile.component').then((c) => c.ProfileComponent)
+    },
+    {
+        path: "add-product",
+        loadComponent: () => import('./add-product/add-product.component').then((c) => c.AddProductComponent)
+    },
+    { path: '**', redirectTo: '' },
 ];

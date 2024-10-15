@@ -12,7 +12,6 @@ import java.util.Set;
 @Repository
 public interface CarrelloProdottoRepository extends JpaRepository<CarrelloProdotto, Integer> {
 
-    boolean existsByCarrelloAndProdotto(Carrello carrello, Prodotto prodotto);
     CarrelloProdotto findByCarrelloAndProdotto(Carrello carrello, Prodotto prod);
     CarrelloProdotto findByCarrelloAndProdottoId(Carrello carrello, int prod);
 
